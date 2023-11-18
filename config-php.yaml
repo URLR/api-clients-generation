@@ -7,4 +7,3 @@ additionalProperties:
     developerOrganizationUrl: https://github.com/URLR
     artifactUrl: https://github.com/URLR/urlr-php
     licenseName: MIT
-    appDescription: "test"

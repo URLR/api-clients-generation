@@ -7,3 +7,9 @@ API Clients are built with https://github.com/OpenAPITools/openapi-generator
 ```
 make sdk-php
 ```
+
+## JavaScript
+
+```
+make sdk-javascript
+```
