@@ -1,21 +1,32 @@
 # URLR - API Clients Generation
 
-API Clients are built with https://github.com/OpenAPITools/openapi-generator
+API Clients are built from our openapi.yaml with [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator).
 
-## Setup
+The clients are automatically pushed to their own repositories thanks to a GitHub action :
+
+- JavaScript: https://github.com/URLR/urlr-javascript
+- PHP: https://github.com/URLR/urlr-php
+
+## Manual Setup
+
+### Setup
 
 ```
 npm install
 ```
 
-## PHP
+### PHP
 
 ```
 npm run generate-php
 ```
 
-## JavaScript
+### JavaScript
 
 ```
 npm run generate-javascript
 ```
+
+### Acknowledgements
+
+Greatly inspired by Phrase's way of doing things: https://github.com/phrase/openapi
