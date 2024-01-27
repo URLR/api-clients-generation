@@ -2,14 +2,20 @@
 
 API Clients are built with https://github.com/OpenAPITools/openapi-generator
 
+## Setup
+
+```
+npm install
+```
+
 ## PHP
 
 ```
-make urlr-php
+npm run generate-php
 ```
 
 ## JavaScript
 
 ```
-make urlr-javascript
+npm run generate-javascript
 ```

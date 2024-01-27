@@ -1,0 +1,179 @@
+openapi: 3.0.0
+info:
+  title: 'Developer API - URLR'
+  description: 'API powering the features of URLR.'
+  termsOfService: 'https://urlr.me/en/terms-of-use'
+  contact:
+    name: URLR
+    url: 'https://urlr.me/en'
+    email: contact@urlr.me
+  license:
+    name: 'All rights reserved'
+    url: 'https://urlr.me/en/legal-notice'
+  version: '0.2'
+servers:
+  -
+    url: 'https://urlr.me/api'
+    description: 'Main API entry point'
+paths:
+  /login_check:
+    post:
+      tags:
+        - Authentification
+      summary: 'Get an access token'
+      operationId: authentification
+      requestBody:
+        description: 'Your credentials'
+        content:
+          application/json:
+            schema:
+              required:
+                - 'username, password'
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              type: object
+      responses:
+        '200':
+          description: 'Your token is ready!'
+          content:
+            application/json:
+              schema:
+                properties:
+                  token: { type: string }
+                type: object
+        '401':
+          description: 'Invalid credentials'
+          content:
+            application/json:
+              schema:
+                properties:
+                  code: { type: integer, example: 401 }
+                  message: { type: string, example: 'Invalid credentials.' }
+                type: object
+  /reduce-link:
+    post:
+      tags:
+        - Link
+      summary: 'Reduce a link'
+      operationId: reduceLink
+      requestBody:
+        description: 'Infos of the link to reduce'
+        content:
+          application/json:
+            schema:
+              required:
+                - url
+                - team
+              properties:
+                url:
+                  description: 'The url to reduce'
+                  type: string
+                team:
+                  description: 'Team id (displayed on dashboard)'
+                  type: string
+                folder:
+                  description: 'Folder id (displayed on dashboard)'
+                  type: string
+                code:
+                  description: 'Custom code'
+                  type: string
+                  pattern: '^[a-zA-Z0-9!-]{3,50}$'
+                label:
+                  description: 'Link label'
+                  type: string
+                password:
+                  description: 'Link password'
+                  type: string
+                expired_at:
+                  description: 'Expiration date'
+                  type: string
+              type: object
+      responses:
+        '200':
+          description: 'The shortened link'
+          content:
+            application/json:
+              schema:
+                properties:
+                  url: { description: 'Input url to reduce', type: string }
+                  expired_at: { description: 'Expiration date', type: string }
+                  team: { description: 'Team id (displayed on dashboard)', type: string }
+                  folder: { description: 'Folder id (displayed on dashboard)', type: string }
+                  url_code: { type: string, example: xMs5c }
+                  domain: { type: string, example: urlr.me }
+                  code: { description: 'HTTP status code', type: integer, example: 200 }
+                type: object
+        '400':
+          description: 'An error occurred'
+          content:
+            application/json:
+              schema:
+                properties:
+                  code: { description: 'HTTP status code', type: integer, example: 401 }
+                  error: { type: integer, example: -1 }
+                  message: { description: 'Message describing the error', type: string }
+                type: object
+      security:
+        -
+          bearerAuth: []
+  /stats:
+    post:
+      tags:
+        - Stats
+      summary: 'Get statistics of a link'
+      operationId: stats
+      requestBody:
+        description: 'Infos to provide to get statistics of a link'
+        content:
+          application/json:
+            schema:
+              required:
+                - code
+              properties:
+                code:
+                  description: 'The short code of the url'
+                  type: string
+                  pattern: '^[a-zA-Z0-9!-]{3,50}$'
+                from:
+                  description: 'Get stats from this date'
+                  type: string
+                  example: dd/mm/yyyy
+                to:
+                  description: 'Get stats until this date'
+                  type: string
+                  example: dd/mm/yyyy
+                includeBots:
+                  description: 'Whether include bots or not in statistics'
+                  type: boolean
+              type: object
+      responses:
+        '200':
+          description: 'Statistics of the link'
+          content:
+            application/json:
+              schema:
+                properties:
+                  clicks: { type: integer, example: 32 }
+                  uniqueClicks: { type: integer, example: 51 }
+                type: object
+        '400':
+          description: 'An error occurred'
+          content:
+            application/json:
+              schema:
+                properties:
+                  code: { type: integer, example: 401 }
+                  error: { type: integer, example: -1 }
+                type: object
+      security:
+        -
+          bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      bearerFormat: JWT
+      scheme: bearer
