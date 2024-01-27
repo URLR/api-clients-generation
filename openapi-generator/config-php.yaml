@@ -1,9 +1,8 @@
-additionalProperties:
-    composerPackageName: urlr/urlr-php
-    artifactVersion: 1.0.0
-    invokerPackage: URLR
-    variableNamingConvention: camelCase
-    developerOrganization: URLR
-    developerOrganizationUrl: https://github.com/URLR
-    artifactUrl: https://github.com/URLR/urlr-php
-    licenseName: MIT
+composerPackageName: urlr/urlr-php
+artifactVersion: 1.0.0
+invokerPackage: URLR
+variableNamingConvention: camelCase
+developerOrganization: URLR
+developerOrganizationUrl: https://github.com/URLR
+artifactUrl: https://github.com/URLR/urlr-php
+licenseName: MIT
