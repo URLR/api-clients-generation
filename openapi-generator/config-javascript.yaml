@@ -1,3 +1,6 @@
 npmName: urlr-js
-npmVersion: 0.0.1
+npmVersion: 0.0.2
 templateDir: openapi-generator/templates/typescript-fetch
+gitHost: github.com
+gitUserId: urlr
+gitRepoId: urlr-javascript
