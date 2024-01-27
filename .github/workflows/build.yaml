@@ -2,7 +2,7 @@ name: API Clients
 on:
   push:
     branches:
-      - master
+      - main
 jobs:
   build-javascripts:
     runs-on: ubuntu-latest
