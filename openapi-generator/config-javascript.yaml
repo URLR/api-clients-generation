@@ -1,0 +1,3 @@
+npmName: urlr
+npmVersion: 0.0.1
+templateDir: openapi-generator/templates/typescript-fetch
