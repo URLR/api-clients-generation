@@ -1,0 +1,131 @@
+# {{packageName}}@{{artifactVersion}}
+
+[![Latest Stable Version](http://poser.pugx.org/urlr/urlr-php/v)](https://packagist.org/packages/urlr/urlr-php) [![Total Downloads](http://poser.pugx.org/urlr/urlr-php/downloads)](https://packagist.org/packages/urlr/urlr-php) [![Latest Unstable Version](http://poser.pugx.org/urlr/urlr-php/v/unstable)](https://packagist.org/packages/urlr/urlr-php) [![License](http://poser.pugx.org/urlr/urlr-php/license)](https://packagist.org/packages/urlr/urlr-php)
+
+This SDK is automatically generated with the [OpenAPI Generator](https://openapi-generator.tech) project.
+
+- API version: {{appVersion}}
+- Package version: {{artifactVersion}}
+{{^hideGenerationTimestamp}}
+- Build date: {{generatedDate}}
+{{/hideGenerationTimestamp}}
+- Build package: {{composerPackageName}}
+
+{{#infoUrl}}
+For more information, please visit [{{{infoUrl}}}]({{{infoUrl}}})
+{{/infoUrl}}
+
+## Installation & Usage
+
+### Requirements
+
+PHP 8.1 and later.
+
+### Composer
+
+You can install the bindings via [Composer](http://getcomposer.org/). Run the following command:
+
+```bash
+composer require urlr/urlr-php
+```
+
+### Manual Installation
+
+Download the files and include `autoload.php`:
+
+```php
+<?php
+require_once('/path/to/{{packageName}}/vendor/autoload.php');
+```
+
+## Getting Started
+
+Please follow the [installation procedure](#installation--usage) and then run the following:
+
+```php
+<?php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+{{#apiInfo}}{{#apis}}{{#-first}}{{#operations}}{{#operation}}{{#-first}}
+{{> php_doc_auth_partial}}
+$apiInstance = new {{invokerPackage}}\Api\{{classname}}(
+    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
+    // This is optional, `GuzzleHttp\Client` will be used as default.
+    new GuzzleHttp\Client(){{#hasAuthMethods}},
+    $config{{/hasAuthMethods}}
+);
+{{#allParams}}${{paramName}} = {{{example}}}; // {{{dataType}}}{{#description}} | {{{.}}}{{/description}}
+{{/allParams}}
+
+try {
+    {{#returnType}}$result = {{/returnType}}$apiInstance->{{{operationId}}}({{#allParams}}${{paramName}}{{^-last}}, {{/-last}}{{/allParams}});{{#returnType}}
+    print_r($result);{{/returnType}}
+} catch (Exception $e) {
+    echo 'Exception when calling {{classname}}->{{operationId}}: ', $e->getMessage(), PHP_EOL;
+}
+{{/-first}}{{/operation}}{{/operations}}{{/-first}}{{/apis}}{{/apiInfo}}
+```
+
+## API Endpoints
+
+All URIs are relative to *{{basePath}}*
+
+Class | Method | HTTP request | Description
+------------ | ------------- | ------------- | -------------
+{{#apiInfo}}{{#apis}}{{#operations}}{{#operation}}*{{classname}}* | [**{{operationId}}**]({{apiDocPath}}/{{classname}}.md#{{operationIdLowerCase}}) | **{{httpMethod}}** {{path}} | {{summary}}
+{{/operation}}{{/operations}}{{/apis}}{{/apiInfo}}
+
+## Models
+
+{{#models}}{{#model}}- [{{{classname}}}]({{modelDocPath}}/{{{classname}}}.md){{/model}}
+{{/models}}
+
+## Authorization
+
+{{^authMethods}}
+All endpoints do not require authorization.
+{{/authMethods}}
+{{#authMethods}}
+{{#last}} Authentication schemes defined for the API:{{/last}}
+### {{{name}}}
+{{#isApiKey}}
+
+- **Type**: API key
+- **API key parameter name**: {{{keyParamName}}}
+- **Location**: {{#isKeyInQuery}}URL query string{{/isKeyInQuery}}{{#isKeyInHeader}}HTTP header{{/isKeyInHeader}}
+
+{{/isApiKey}}
+{{#isBasic}}
+{{#isBasicBasic}}
+
+- **Type**: HTTP basic authentication
+{{/isBasicBasic}}
+{{#isBasicBearer}}
+
+- **Type**: Bearer authentication{{#bearerFormat}} ({{{.}}}){{/bearerFormat}}
+{{/isBasicBearer}}
+{{/isBasic}}
+{{#isOAuth}}
+
+- **Type**: `OAuth`
+- **Flow**: `{{{flow}}}`
+- **Authorization URL**: `{{{authorizationUrl}}}`
+- **Scopes**: {{^scopes}}N/A{{/scopes}}
+{{#scopes}}
+    - **{{{scope}}}**: {{{description}}}
+{{/scopes}}
+{{/isOAuth}}
+
+{{/authMethods}}
+
+## Tests
+
+To run the tests, use:
+
+```bash
+composer install
+vendor/bin/phpunit
+
+## Get help / support
+
+Please contact [contact@urlr.me](mailto:contact@urlr.me?subject=[GitHub]%urlr-php) and we can take more direct action toward finding a solution.
