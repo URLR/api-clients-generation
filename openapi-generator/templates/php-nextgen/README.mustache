@@ -44,27 +44,48 @@ Please follow the [installation procedure](#installation--usage) and then run th
 
 ```php
 <?php
+
 require_once(__DIR__ . '/vendor/autoload.php');
 
-{{#apiInfo}}{{#apis}}{{#-first}}{{#operations}}{{#operation}}{{#-first}}
-{{> php_doc_auth_partial}}
-$apiInstance = new {{invokerPackage}}\Api\{{classname}}(
+// Authentification
+
+$authentificationApi = new URLR\Api\AuthentificationApi(
     // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
     // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client(){{#hasAuthMethods}},
-    $config{{/hasAuthMethods}}
+    new GuzzleHttp\Client()
 );
-{{#allParams}}${{paramName}} = {{{example}}}; // {{{dataType}}}{{#description}} | {{{.}}}{{/description}}
-{{/allParams}}
+$authentificationRequest = new \URLR\Model\AuthentificationRequest([
+    'username' => '',
+    'password' => '',
+]); // \URLR\Model\AuthentificationRequest | Your credentials
 
 try {
-    {{#returnType}}$result = {{/returnType}}$apiInstance->{{{operationId}}}({{#allParams}}${{paramName}}{{^-last}}, {{/-last}}{{/allParams}});{{#returnType}}
-    print_r($result);{{/returnType}}
+    $token = $authentificationApi->authentification($authentificationRequest)->getToken();
 } catch (Exception $e) {
-    echo 'Exception when calling {{classname}}->{{operationId}}: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling AuthentificationApi->authentification: ', $e->getMessage(), PHP_EOL;
+    exit;
 }
-{{/-first}}{{/operation}}{{/operations}}{{/-first}}{{/apis}}{{/apiInfo}}
+
+$config = URLR\Configuration::getDefaultConfiguration()->setAccessToken($token);
+
+// Link shortening
+
+$linkApi = new URLR\Api\LinkApi(null, $config);
+
+$reduceLinkRequest = new \URLR\Model\ReduceLinkRequest([
+    'url' => '',
+    'team' => ''
+]); // \URLR\Model\ReduceLinkRequest | Infos of the link to reduce
+
+try {
+    $result = $apiInstance->reduceLink($reduceLinkRequest);
+    print_r($result);
+} catch (Exception $e) {
+    echo 'Exception when calling LinkApi->reduceLink: ', $e->getMessage(), PHP_EOL;
+}
 ```
+
+A complete example is [available here](examples/example1.php).
 
 ## API Endpoints
 
