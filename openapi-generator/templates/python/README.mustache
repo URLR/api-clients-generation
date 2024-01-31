@@ -1,0 +1,115 @@
+# {{{packageName}}}@{{packageVersion}}
+
+This SDK is automatically generated with the [OpenAPI Generator](https://openapi-generator.tech) project.
+
+- API version: {{appVersion}}
+- Package version: {{packageVersion}}
+{{^hideGenerationTimestamp}}
+- Build date: {{generatedDate}}
+{{/hideGenerationTimestamp}}
+- Build package: {{generatorClass}}
+{{#infoUrl}}
+For more information, please visit [{{{infoUrl}}}]({{{infoUrl}}})
+{{/infoUrl}}
+
+## Requirements
+
+Python {{{generatorLanguageVersion}}}
+
+## Installation & Usage
+
+### pip install
+
+If the python package is hosted on a repository, you can install directly using:
+
+```sh
+pip install git+https://{{gitHost}}/{{{gitUserId}}}/{{{gitRepoId}}}.git
+```
+(you may need to run `pip` with root permission: `sudo pip install git+https://{{gitHost}}/{{{gitUserId}}}/{{{gitRepoId}}}.git`)
+
+Then import the package:
+```python
+import {{{packageName}}}
+```
+
+### Setuptools
+
+Install via [Setuptools](http://pypi.python.org/pypi/setuptools).
+
+```sh
+python setup.py install --user
+```
+(or `sudo python setup.py install` to install the package for all users)
+
+Then import the package:
+```python
+import {{{packageName}}}
+```
+
+### Tests
+
+Execute `pytest` to run the tests.
+
+## Getting Started
+
+Please follow the [installation procedure](#installation--usage) and then run the following:
+
+```python
+```
+
+A complete example is [available here](examples/example1.py).
+
+## API Endpoints
+
+All URIs are relative to *{{{basePath}}}*
+
+Class | Method | HTTP request | Description
+------------ | ------------- | ------------- | -------------
+{{#apiInfo}}{{#apis}}{{#operations}}{{#operation}}*{{classname}}* | [**{{operationId}}**]({{apiDocPath}}{{classname}}.md#{{operationIdLowerCase}}) | **{{httpMethod}}** {{path}} | {{summary}}
+{{/operation}}{{/operations}}{{/apis}}{{/apiInfo}}
+
+## Models
+
+{{#models}}{{#model}} - [{{{classname}}}]({{modelDocPath}}{{{classname}}}.md)
+{{/model}}{{/models}}
+
+<a id="documentation-for-authorization"></a>
+
+## Authorization
+
+{{^authMethods}}Endpoints do not require authorization.{{/authMethods}}
+{{#hasAuthMethods}}Authentication schemes defined for the API:{{/hasAuthMethods}}
+{{#authMethods}}
+<a id="{{name}}"></a>
+### {{{name}}}
+
+{{#isApiKey}}
+- **Type**: API key
+- **API key parameter name**: {{{keyParamName}}}
+- **Location**: {{#isKeyInQuery}}URL query string{{/isKeyInQuery}}{{#isKeyInHeader}}HTTP header{{/isKeyInHeader}}
+{{/isApiKey}}
+{{#isBasic}}
+{{#isBasicBasic}}
+- **Type**: HTTP basic authentication
+{{/isBasicBasic}}
+{{#isBasicBearer}}
+- **Type**: Bearer authentication{{#bearerFormat}} ({{{.}}}){{/bearerFormat}}
+{{/isBasicBearer}}
+{{#isHttpSignature}}
+- **Type**: HTTP signature authentication
+{{/isHttpSignature}}
+{{/isBasic}}
+{{#isOAuth}}
+- **Type**: OAuth
+- **Flow**: {{{flow}}}
+- **Authorization URL**: {{{authorizationUrl}}}
+- **Scopes**: {{^scopes}}N/A{{/scopes}}
+{{#scopes}} - **{{{scope}}}**: {{{description}}}
+{{/scopes}}
+{{/isOAuth}}
+
+{{/authMethods}}
+
+## Get help / support
+
+Please contact [contact@urlr.me](mailto:contact@urlr.me?subject=[GitHub]%urlr-python) and we can take more direct action toward finding a solution.

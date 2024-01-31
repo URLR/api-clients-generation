@@ -4,6 +4,7 @@
   },
   "scripts": {
     "generate-php": "npx openapi-generator-cli generate -g php-nextgen -o clients/urlr-php -i openapi.yaml -c openapi-generator/config-php.yaml",
-    "generate-javascript": "npx openapi-generator-cli generate -g typescript-fetch -o clients/urlr-javascript -i openapi.yaml -c openapi-generator/config-javascript.yaml"
+    "generate-javascript": "npx openapi-generator-cli generate -g typescript-fetch -o clients/urlr-javascript -i openapi.yaml -c openapi-generator/config-javascript.yaml",
+    "generate-python": "npx openapi-generator-cli generate -g python -o clients/urlr-python -i openapi.yaml -c openapi-generator/config-python.yaml"
   }
 }

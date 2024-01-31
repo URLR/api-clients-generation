@@ -6,6 +6,7 @@ The clients are automatically pushed to their own repositories thanks to a GitHu
 
 - JavaScript: https://github.com/URLR/urlr-javascript
 - PHP: https://github.com/URLR/urlr-php
+- Python: https://github.com/URLR/urlr-python
 
 ## Manual Setup
 
@@ -25,6 +26,12 @@ npm run generate-php
 
 ```
 npm run generate-javascript
+```
+
+### Python
+
+```
+npm run generate-python
 ```
 
 ### Acknowledgements

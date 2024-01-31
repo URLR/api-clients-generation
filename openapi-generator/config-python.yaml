@@ -1,0 +1,8 @@
+projectName: URLR
+packageName: urlr
+packageVersion: 0.0.1
+infoName: URLR
+infoEmail: contact@urlr.me
+gitUserId: urlr
+gitRepoId: urlr-python
+templateDir: openapi-generator/templates/python
