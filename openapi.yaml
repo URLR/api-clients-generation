@@ -100,8 +100,8 @@ paths:
                 properties:
                   url: { description: 'Input url to reduce', type: string }
                   expired_at: { description: 'Expiration date', type: string }
-                  team: { description: 'Team id (displayed on dashboard)', type: string }
-                  folder: { description: 'Folder id (displayed on dashboard)', type: string }
+                  team: { description: 'Team id (displayed on dashboard)', type: integer }
+                  folder: { description: 'Folder id (displayed on dashboard)', type: integer }
                   url_code: { type: string, example: xMs5c }
                   domain: { type: string, example: urlr.me }
                   code: { description: 'HTTP status code', type: integer, example: 200 }
