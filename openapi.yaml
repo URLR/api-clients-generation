@@ -10,7 +10,7 @@ info:
   license:
     name: 'All rights reserved'
     url: 'https://urlr.me/en/legal-notice'
-  version: '0.2'
+  version: '0.3'
 servers:
   -
     url: 'https://urlr.me/api'
@@ -31,8 +31,10 @@ paths:
                 - 'username, password'
               properties:
                 username:
+                  description: Email
                   type: string
                 password:
+                  description: Password
                   type: string
               type: object
       responses:
@@ -57,10 +59,10 @@ paths:
     post:
       tags:
         - Link
-      summary: 'Reduce a link'
+      summary: 'Shorten a link'
       operationId: reduceLink
       requestBody:
-        description: 'Infos of the link to reduce'
+        description: 'Info of the link to shorten'
         content:
           application/json:
             schema:
@@ -69,23 +71,23 @@ paths:
                 - team
               properties:
                 url:
-                  description: 'The url to reduce'
+                  description: 'URL to shorten'
                   type: string
                 team:
-                  description: 'Team id (displayed on dashboard)'
+                  description: 'Team ID (displayed on dashboard)'
                   type: string
                 folder:
-                  description: 'Folder id (displayed on dashboard)'
+                  description: 'Folder ID (displayed on dashboard)'
                   type: string
                 code:
-                  description: 'Custom code'
+                  description: 'Custom short code'
                   type: string
                   pattern: '^[a-zA-Z0-9!-]{3,50}$'
                 label:
-                  description: 'Link label'
+                  description: Label
                   type: string
                 password:
-                  description: 'Link password'
+                  description: Password
                   type: string
                 expired_at:
                   description: 'Expiration date'
@@ -98,12 +100,12 @@ paths:
             application/json:
               schema:
                 properties:
-                  url: { description: 'Input url to reduce', type: string }
+                  url: { description: 'Original URL', type: string }
                   expired_at: { description: 'Expiration date', type: string }
-                  team: { description: 'Team id (displayed on dashboard)', type: integer }
-                  folder: { description: 'Folder id (displayed on dashboard)', type: integer }
-                  url_code: { type: string, example: xMs5c }
-                  domain: { type: string, example: urlr.me }
+                  team: { description: 'Team ID (displayed on dashboard)', type: integer }
+                  folder: { description: 'Folder ID (displayed on dashboard)', type: integer }
+                  url_code: { description: 'Short code', type: string, example: xMs5c }
+                  domain: { description: Domain, type: string, example: urlr.me }
                   code: { description: 'HTTP status code', type: integer, example: 200 }
                 type: object
         '400':
@@ -113,7 +115,7 @@ paths:
               schema:
                 properties:
                   code: { description: 'HTTP status code', type: integer, example: 401 }
-                  error: { type: integer, example: -1 }
+                  error: { description: 'Error code', type: integer, example: -1 }
                   message: { description: 'Message describing the error', type: string }
                 type: object
       security:
@@ -134,7 +136,7 @@ paths:
                 - code
               properties:
                 code:
-                  description: 'The short code of the url'
+                  description: 'The short code of the URL'
                   type: string
                   pattern: '^[a-zA-Z0-9!-]{3,50}$'
                 from:
@@ -156,8 +158,8 @@ paths:
             application/json:
               schema:
                 properties:
-                  clicks: { type: integer, example: 32 }
-                  uniqueClicks: { type: integer, example: 51 }
+                  clicks: { description: Clicks, type: integer, example: 32 }
+                  uniqueClicks: { description: 'Unique clicks', type: integer, example: 51 }
                 type: object
         '400':
           description: 'An error occurred'
@@ -167,6 +169,55 @@ paths:
                 properties:
                   code: { type: integer, example: 401 }
                   error: { type: integer, example: -1 }
+                type: object
+      security:
+        -
+          bearerAuth: []
+  /team:
+    get:
+      tags:
+        - Team
+      summary: 'Get teams of user'
+      operationId: team
+      responses:
+        '200':
+          description: 'Teams of user'
+          content:
+            application/json:
+              schema:
+                properties:
+                  teams: { type: array, items: { properties: { id: { description: 'Team ID', type: integer, example: 131 }, name: { description: 'Team name', type: string, example: 'the best team' } }, type: object } }
+                type: object
+      security:
+        -
+          bearerAuth: []
+  /folder:
+    get:
+      tags:
+        - Folder
+      summary: 'Get folders of team'
+      operationId: folder
+      requestBody:
+        description: 'Infos to provide to get folders of team'
+        content:
+          application/json:
+            schema:
+              required:
+                - team
+              properties:
+                team:
+                  description: 'Team ID (displayed on dashboard)'
+                  type: integer
+                  example: 123
+              type: object
+      responses:
+        '200':
+          description: 'Folders of team'
+          content:
+            application/json:
+              schema:
+                properties:
+                  folders: { type: array, items: { properties: { id: { description: 'Folder ID', type: integer, example: 123 }, name: { description: 'Folder name', type: string, example: folder-campaign-google-ads } }, type: object } }
                 type: object
       security:
         -
