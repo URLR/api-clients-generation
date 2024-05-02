@@ -34,6 +34,14 @@ npm run generate-javascript
 npm run generate-python
 ```
 
+## Publishing
+
+JS: npm publish
+
+Python: python3 -m build && twine upload dist/*
+
+PHP: auto publish hook
+
 ### Acknowledgements
 
 Greatly inspired by Phrase's way of doing things: https://github.com/phrase/openapi
