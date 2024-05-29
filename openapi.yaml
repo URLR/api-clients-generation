@@ -23,7 +23,7 @@ paths:
       summary: 'Get an access token'
       operationId: createAccessToken
       requestBody:
-        description: 'Your credentials'
+        description: 'You can use this endpoint to get an access token to access the API.'
         content:
           application/json:
             schema:
@@ -64,7 +64,7 @@ paths:
       summary: 'Refresh an access token'
       operationId: refreshAccessToken
       requestBody:
-        description: 'Your credentials'
+        description: 'You can use this endpoint to refresh your access token without credentials.'
         content:
           application/json:
             schema:
@@ -208,7 +208,7 @@ paths:
                   url: { description: 'Original URL', type: string }
                   team: { description: 'Team API ID', type: string, format: uuid }
                   folder_id: { description: 'Folder API ID', type: string, format: uuid }
-                  domain_id: { description: Domain, type: string, example: urlr.me }
+                  domain: { description: Domain, type: string, example: urlr.me }
                   code: { description: 'Short code', type: string, example: xxxxx }
                   label: { description: Label, type: string }
                   created_at: { description: 'Creation date', type: string, format: date-time }
@@ -281,11 +281,11 @@ paths:
                   type: string
                   format: uuid
                 from:
-                  description: 'Get stats from this date'
+                  description: 'Get statistics from this date'
                   type: string
                   format: date-time
                 to:
-                  description: 'Get stats until this date'
+                  description: 'Get statistics until this date'
                   type: string
                   format: date-time
                 include_bots:
