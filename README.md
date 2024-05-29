@@ -36,9 +36,9 @@ npm run generate-python
 
 ## Publishing
 
-JS: npm publish
+JS: `npm publish`
 
-Python: python3 -m build && twine upload dist/*
+Python: `python3 -m build && twine upload dist/*`
 
 PHP: auto publish hook
 

@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  title: 'Developer API - URLR'
-  description: 'API powering the features of URLR.'
+  title: 'URLR API Reference'
+  description: "API powering the features of URLR.<br><br>Note that in order to facilitate integration, we provide SDKs for various languages at https://github.com/URLR.<br><br>Key API principles:<br>\n        <ul><li>All dates follow **ISO-8601** format</li><li>Most errors follow **RFC 9457** standard</li><li>All responses are delivered in English</li></ul>"
   termsOfService: 'https://urlr.me/en/terms-of-use'
   contact:
     name: URLR
@@ -10,25 +10,26 @@ info:
   license:
     name: 'All rights reserved'
     url: 'https://urlr.me/en/legal-notice'
-  version: '0.3'
+  version: '1.0'
 servers:
   -
-    url: 'https://urlr.me/api'
+    url: 'https://urlr.me/api/v1'
     description: 'Main API entry point'
 paths:
-  /login_check:
+  /access_tokens/create:
     post:
       tags:
-        - Authentification
+        - 'Access Tokens'
       summary: 'Get an access token'
-      operationId: authentification
+      operationId: createAccessToken
       requestBody:
         description: 'Your credentials'
         content:
           application/json:
             schema:
               required:
-                - 'username, password'
+                - username
+                - password
               properties:
                 username:
                   description: Email
@@ -39,15 +40,16 @@ paths:
               type: object
       responses:
         '200':
-          description: 'Your token is ready!'
+          description: 'Access token'
           content:
             application/json:
               schema:
                 properties:
-                  token: { type: string }
+                  token: { description: 'Access token (JWT) valid for 1 hour', type: string }
+                  refresh_token: { description: 'Refresh token valid for 1 month', type: string }
                 type: object
         '401':
-          description: 'Invalid credentials'
+          description: Error
           content:
             application/json:
               schema:
@@ -55,34 +57,135 @@ paths:
                   code: { type: integer, example: 401 }
                   message: { type: string, example: 'Invalid credentials.' }
                 type: object
-  /reduce-link:
+  /access_tokens/refresh:
     post:
       tags:
-        - Link
-      summary: 'Shorten a link'
-      operationId: reduceLink
+        - 'Access Tokens'
+      summary: 'Refresh an access token'
+      operationId: refreshAccessToken
       requestBody:
-        description: 'Info of the link to shorten'
+        description: 'Your credentials'
+        content:
+          application/json:
+            schema:
+              required:
+                - refresh_token
+              properties:
+                refresh_token:
+                  description: 'Refresh token'
+                  type: string
+              type: object
+      responses:
+        '200':
+          description: 'Refreshed access token'
+          content:
+            application/json:
+              schema:
+                properties:
+                  token: { description: 'Access token (JWT) valid for 1 hour', type: string }
+                  refresh_token: { description: 'Refresh token valid for 1 month', type: string }
+                type: object
+        '401':
+          description: Error
+          content:
+            application/json:
+              schema:
+                properties:
+                  code: { type: integer, example: 401 }
+                  message: { type: string, example: 'Missing JWT Refresh Token' }
+                type: object
+  '/links/{link_id}':
+    get:
+      tags:
+        - Links
+      summary: 'Get a link'
+      operationId: getLink
+      parameters:
+        -
+          name: link_id
+          in: path
+          description: 'Link API ID'
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: ffefc6c4-d970-4373-a867-2a69c8be2c89
+      responses:
+        '200':
+          description: Link
+          content:
+            application/json:
+              schema:
+                properties:
+                  id: { description: 'Link API ID', type: string, format: uuid, example: 436b5d20-e174-4363-94e5-2b3dd4e74b5f }
+                type: object
+        '404':
+          description: 'Not Found'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 404 }
+                  detail: { type: string }
+                type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 401 }
+                  detail: { type: string }
+                type: object
+        '422':
+          description: 'Validation Failed'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 422 }
+                  detail: { type: string }
+                type: object
+      security:
+        -
+          bearerAuth: []
+  /links/create:
+    post:
+      tags:
+        - Links
+      summary: 'Create a link'
+      operationId: createLink
+      requestBody:
+        description: 'Info of the link to create'
         content:
           application/json:
             schema:
               required:
                 - url
-                - team
+                - team_id
               properties:
                 url:
                   description: 'URL to shorten'
                   type: string
-                team:
-                  description: 'Team ID (displayed on dashboard)'
+                team_id:
+                  description: 'Team API ID'
                   type: string
-                folder:
-                  description: 'Folder ID (displayed on dashboard)'
+                  format: uuid
+                folder_id:
+                  description: 'Folder API ID'
                   type: string
+                  format: uuid
                 code:
                   description: 'Custom short code'
                   type: string
                   pattern: '^[a-zA-Z0-9!-]{3,50}$'
+                  example: xxxxx
                 label:
                   description: Label
                   type: string
@@ -92,64 +195,103 @@ paths:
                 expired_at:
                   description: 'Expiration date'
                   type: string
+                  format: date-time
               type: object
       responses:
-        '200':
-          description: 'The shortened link'
+        '201':
+          description: Link
           content:
             application/json:
               schema:
                 properties:
+                  id: { description: 'Link API ID', type: string, format: uuid }
                   url: { description: 'Original URL', type: string }
-                  expired_at: { description: 'Expiration date', type: string }
-                  team: { description: 'Team ID (displayed on dashboard)', type: integer }
-                  folder: { description: 'Folder ID (displayed on dashboard)', type: integer }
-                  url_code: { description: 'Short code', type: string, example: xMs5c }
-                  domain: { description: Domain, type: string, example: urlr.me }
-                  code: { description: 'HTTP status code', type: integer, example: 200 }
+                  team: { description: 'Team API ID', type: string, format: uuid }
+                  folder_id: { description: 'Folder API ID', type: string, format: uuid }
+                  domain_id: { description: Domain, type: string, example: urlr.me }
+                  code: { description: 'Short code', type: string, example: xxxxx }
+                  label: { description: Label, type: string }
+                  created_at: { description: 'Creation date', type: string, format: date-time }
+                  updated_at: { description: 'Modification date', type: string, format: date-time }
+                  expired_at: { description: 'Expiration date', type: string, format: date-time }
                 type: object
-        '400':
-          description: 'An error occurred'
+        '401':
+          description: Unauthorized
           content:
-            application/json:
+            application/problem+json:
               schema:
                 properties:
-                  code: { description: 'HTTP status code', type: integer, example: 401 }
-                  error: { description: 'Error code', type: integer, example: -1 }
-                  message: { description: 'Message describing the error', type: string }
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 401 }
+                  detail: { type: string }
+                type: object
+        '422':
+          description: 'Validation Failed'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 422 }
+                  detail: { type: string }
+                type: object
+        '429':
+          description: 'Limits Exceeded'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 429 }
+                  detail: { type: string }
+                type: object
+        '500':
+          description: 'Internal Error'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 500 }
+                  detail: { type: string }
                 type: object
       security:
         -
           bearerAuth: []
-  /stats:
+  /statistics:
     post:
       tags:
-        - Stats
+        - Statistics
       summary: 'Get statistics of a link'
-      operationId: stats
+      operationId: getStatistics
       requestBody:
         description: 'Infos to provide to get statistics of a link'
         content:
           application/json:
             schema:
               required:
-                - code
+                - linkId
               properties:
-                code:
-                  description: 'The short code of the URL'
+                link_id:
+                  description: 'Link API ID'
                   type: string
-                  pattern: '^[a-zA-Z0-9!-]{3,50}$'
+                  format: uuid
                 from:
                   description: 'Get stats from this date'
                   type: string
-                  example: dd/mm/yyyy
+                  format: date-time
                 to:
                   description: 'Get stats until this date'
                   type: string
-                  example: dd/mm/yyyy
-                includeBots:
+                  format: date-time
+                include_bots:
                   description: 'Whether include bots or not in statistics'
                   type: boolean
+                  default: false
               type: object
       responses:
         '200':
@@ -158,27 +300,52 @@ paths:
             application/json:
               schema:
                 properties:
+                  link_id: { description: 'Link API ID', type: string, format: uuid }
                   clicks: { description: Clicks, type: integer, example: 32 }
-                  uniqueClicks: { description: 'Unique clicks', type: integer, example: 51 }
+                  unique_clicks: { description: 'Unique clicks', type: integer, example: 51 }
                 type: object
-        '400':
-          description: 'An error occurred'
+        '404':
+          description: 'Not Found'
           content:
-            application/json:
+            application/problem+json:
               schema:
                 properties:
-                  code: { type: integer, example: 401 }
-                  error: { type: integer, example: -1 }
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 404 }
+                  detail: { type: string }
+                type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 401 }
+                  detail: { type: string }
+                type: object
+        '422':
+          description: 'Validation Failed'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 422 }
+                  detail: { type: string }
                 type: object
       security:
         -
           bearerAuth: []
-  /team:
+  /teams:
     get:
       tags:
-        - Team
+        - Teams
       summary: 'Get teams of user'
-      operationId: team
+      operationId: getTeams
       responses:
         '200':
           description: 'Teams of user'
@@ -186,30 +353,38 @@ paths:
             application/json:
               schema:
                 properties:
-                  teams: { type: array, items: { properties: { id: { description: 'Team ID', type: integer, example: 131 }, name: { description: 'Team name', type: string, example: 'the best team' } }, type: object } }
+                  teams: { type: array, items: { properties: { id: { description: 'Team API ID', type: string, format: uuid, example: ffefc6c4-d970-4373-a867-2a69c8be2c89 }, name: { description: 'Team name', type: string, example: 'the best team' } }, type: object } }
+                type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 401 }
+                  detail: { type: string }
                 type: object
       security:
         -
           bearerAuth: []
-  /folder:
+  '/folders/{team_id}':
     get:
       tags:
-        - Folder
+        - Folders
       summary: 'Get folders of team'
-      operationId: folder
-      requestBody:
-        description: 'Infos to provide to get folders of team'
-        content:
-          application/json:
-            schema:
-              required:
-                - team
-              properties:
-                team:
-                  description: 'Team ID (displayed on dashboard)'
-                  type: integer
-                  example: 123
-              type: object
+      operationId: getFolders
+      parameters:
+        -
+          name: team_id
+          in: path
+          description: 'Team API ID'
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: ffefc6c4-d970-4373-a867-2a69c8be2c89
       responses:
         '200':
           description: 'Folders of team'
@@ -217,7 +392,40 @@ paths:
             application/json:
               schema:
                 properties:
-                  folders: { type: array, items: { properties: { id: { description: 'Folder ID', type: integer, example: 123 }, name: { description: 'Folder name', type: string, example: folder-campaign-google-ads } }, type: object } }
+                  folders: { type: array, items: { properties: { id: { description: 'Folder API ID', type: string, format: uuid, example: 436b5d20-e174-4363-94e5-2b3dd4e74b5f }, name: { description: 'Folder name', type: string, example: folder-campaign-google-ads } }, type: object } }
+                type: object
+        '404':
+          description: 'Not Found'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 404 }
+                  detail: { type: string }
+                type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 401 }
+                  detail: { type: string }
+                type: object
+        '422':
+          description: 'Validation Failed'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 422 }
+                  detail: { type: string }
                 type: object
       security:
         -
