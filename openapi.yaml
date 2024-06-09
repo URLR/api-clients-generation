@@ -10,7 +10,7 @@ info:
   license:
     name: 'All rights reserved'
     url: 'https://urlr.me/en/legal-notice'
-  version: '1.0'
+  version: '1.1'
 servers:
   -
     url: 'https://urlr.me/api/v1'
@@ -118,6 +118,17 @@ paths:
               schema:
                 properties:
                   id: { description: 'Link API ID', type: string, format: uuid, example: 436b5d20-e174-4363-94e5-2b3dd4e74b5f }
+                  url: { description: 'Original URL', type: string }
+                  team: { description: 'Team API ID', type: string, format: uuid }
+                  folder_id: { description: 'Folder API ID', type: string, format: uuid }
+                  domain: { description: Domain, type: string, example: urlr.me }
+                  code: { description: 'Short code', type: string, example: xxxxx }
+                  label: { description: Label, type: string }
+                  metatag: { description: 'Custom metadata for social previews', properties: { title: { description: 'Title of the link', type: string }, description: { description: 'Description of the link', type: string }, image: { description: 'Image URL of the link', type: string, format: url } }, type: object }
+                  geolinks: { description: 'Geographical targeting links', type: array, items: { properties: { type: { description: 'Type of the geographic link', type: string }, value: { description: 'Value corresponding to the type of the geographic link', type: string }, url: { description: 'URL of the geographic link', type: string, format: url } }, type: object } }
+                  created_at: { description: 'Creation date', type: string, format: date-time }
+                  updated_at: { description: 'Modification date', type: string, format: date-time }
+                  expired_at: { description: 'Expiration date', type: string, format: date-time }
                 type: object
         '404':
           description: 'Not Found'
@@ -192,6 +203,10 @@ paths:
                 password:
                   description: Password
                   type: string
+                metatag:
+                  description: 'Custom metadata for social previews'
+                  properties: { title: { description: 'Title for the link', type: string }, description: { description: 'Description for the link', type: string }, image: { description: 'Image URL for the link. Recommended: 1200X630px<br>Maximum size: 3Mb - Formats: PNG, JPEG, WebP and GIF.', type: string, format: url } }
+                  type: object
                 expired_at:
                   description: 'Expiration date'
                   type: string
@@ -204,13 +219,15 @@ paths:
             application/json:
               schema:
                 properties:
-                  id: { description: 'Link API ID', type: string, format: uuid }
+                  id: { description: 'Link API ID', type: string, format: uuid, example: 436b5d20-e174-4363-94e5-2b3dd4e74b5f }
                   url: { description: 'Original URL', type: string }
                   team: { description: 'Team API ID', type: string, format: uuid }
                   folder_id: { description: 'Folder API ID', type: string, format: uuid }
                   domain: { description: Domain, type: string, example: urlr.me }
                   code: { description: 'Short code', type: string, example: xxxxx }
                   label: { description: Label, type: string }
+                  metatag: { description: 'Custom metadata for social previews', properties: { title: { description: 'Title of the link', type: string }, description: { description: 'Description of the link', type: string }, image: { description: 'Image URL of the link', type: string, format: url } }, type: object }
+                  geolinks: { description: 'Geographical targeting links', type: array, items: { properties: { type: { description: 'Type of the geographic link', type: string }, value: { description: 'Value corresponding to the type of the geographic link', type: string }, url: { description: 'URL of the geographic link', type: string, format: url } }, type: object } }
                   created_at: { description: 'Creation date', type: string, format: date-time }
                   updated_at: { description: 'Modification date', type: string, format: date-time }
                   expired_at: { description: 'Expiration date', type: string, format: date-time }
