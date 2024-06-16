@@ -10,7 +10,7 @@ info:
   license:
     name: 'All rights reserved'
     url: 'https://urlr.me/en/legal-notice'
-  version: '1.1'
+  version: '1.2'
 servers:
   -
     url: 'https://urlr.me/api/v1'
@@ -124,6 +124,7 @@ paths:
                   domain: { description: Domain, type: string, example: urlr.me }
                   code: { description: 'Short code', type: string, example: xxxxx }
                   label: { description: Label, type: string }
+                  qrcode: { description: 'QR Code associated to the short link', properties: { data: { description: 'QR Code Data URL', type: string } }, type: object }
                   metatag: { description: 'Custom metadata for social previews', properties: { title: { description: 'Title of the link', type: string }, description: { description: 'Description of the link', type: string }, image: { description: 'Image URL of the link', type: string, format: url } }, type: object }
                   geolinks: { description: 'Geographical targeting links', type: array, items: { properties: { type: { description: 'Type of the geographic link', type: string }, value: { description: 'Value corresponding to the type of the geographic link', type: string }, url: { description: 'URL of the geographic link', type: string, format: url } }, type: object } }
                   created_at: { description: 'Creation date', type: string, format: date-time }
@@ -203,6 +204,10 @@ paths:
                 password:
                   description: Password
                   type: string
+                qrcode:
+                  description: 'QR Code'
+                  properties: { size: { description: 'The size of the QR code (px)', type: integer, default: 600 }, format: { description: 'The format of the QR code', type: string, default: png, enum: [png, webp, svg] }, margin: { description: 'The margin around the QR code (px)', type: integer, default: 0 }, background_color: { description: 'The background color of the QR code (hexadecimal)', type: string, default: '#ffffff' }, foreground_color: { description: 'The foreground color of the QR code (hexadecimal)', type: string, default: '#000000' } }
+                  type: object
                 metatag:
                   description: 'Custom metadata for social previews'
                   properties: { title: { description: 'Title for the link', type: string }, description: { description: 'Description for the link', type: string }, image: { description: 'Image URL for the link. Recommended: 1200X630px<br>Maximum size: 3Mb - Formats: PNG, JPEG, WebP and GIF.', type: string, format: url } }
@@ -226,12 +231,119 @@ paths:
                   domain: { description: Domain, type: string, example: urlr.me }
                   code: { description: 'Short code', type: string, example: xxxxx }
                   label: { description: Label, type: string }
+                  qrcode: { description: 'QR Code associated to the short link', properties: { data: { description: 'QR Code Data URL', type: string } }, type: object }
                   metatag: { description: 'Custom metadata for social previews', properties: { title: { description: 'Title of the link', type: string }, description: { description: 'Description of the link', type: string }, image: { description: 'Image URL of the link', type: string, format: url } }, type: object }
                   geolinks: { description: 'Geographical targeting links', type: array, items: { properties: { type: { description: 'Type of the geographic link', type: string }, value: { description: 'Value corresponding to the type of the geographic link', type: string }, url: { description: 'URL of the geographic link', type: string, format: url } }, type: object } }
                   created_at: { description: 'Creation date', type: string, format: date-time }
                   updated_at: { description: 'Modification date', type: string, format: date-time }
                   expired_at: { description: 'Expiration date', type: string, format: date-time }
                 type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 401 }
+                  detail: { type: string }
+                type: object
+        '422':
+          description: 'Validation Failed'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 422 }
+                  detail: { type: string }
+                type: object
+        '429':
+          description: 'Limits Exceeded'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 429 }
+                  detail: { type: string }
+                type: object
+        '500':
+          description: 'Internal Error'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 500 }
+                  detail: { type: string }
+                type: object
+      security:
+        -
+          bearerAuth: []
+  /qrcodes/create:
+    post:
+      tags:
+        - 'QR Codes'
+      summary: 'Create a QR Code'
+      operationId: createQrCode
+      requestBody:
+        description: 'Info of the QR Code to create'
+        content:
+          application/json:
+            schema:
+              properties:
+                size:
+                  description: 'The size of the QR code (px)'
+                  type: integer
+                  default: 600
+                format:
+                  description: 'The format of the QR code'
+                  type: string
+                  default: png
+                  enum: [png, webp, svg]
+                margin:
+                  description: 'The margin around the QR code (px)'
+                  type: integer
+                  default: 0
+                background_color:
+                  description: 'The background color of the QR code (hexadecimal)'
+                  type: string
+                  default: '#ffffff'
+                foreground_color:
+                  description: 'The foreground color of the QR code (hexadecimal)'
+                  type: string
+                  default: '#000000'
+              type: object
+              oneOf:
+                -
+                  required: [url, team_id]
+                  properties: { url: { description: 'URL of the QR Code', type: string, format: url }, team_id: { description: 'Team API ID', type: string, format: uuid } }
+                  type: object
+                -
+                  required: [link_id]
+                  properties: { link_id: { description: 'Link API ID of the QR Code', type: string, format: uuid } }
+                  type: object
+      responses:
+        '201':
+          description: 'QR Code'
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/webp:
+              schema:
+                type: string
+                format: binary
+            image/svg+xml:
+              schema:
+                type: string
+                format: binary
         '401':
           description: Unauthorized
           content:
