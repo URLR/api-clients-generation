@@ -10,7 +10,7 @@ info:
   license:
     name: 'All rights reserved'
     url: 'https://urlr.me/en/legal-notice'
-  version: '1.2'
+  version: '1.3'
 servers:
   -
     url: 'https://urlr.me/api/v1'
@@ -121,7 +121,7 @@ paths:
                   url: { description: 'Original URL', type: string }
                   team: { description: 'Team API ID', type: string, format: uuid }
                   folder_id: { description: 'Folder API ID', type: string, format: uuid }
-                  domain: { description: Domain, type: string, example: urlr.me }
+                  domain: { description: Domain, type: string, format: hostname, example: urlr.me }
                   code: { description: 'Short code', type: string, example: xxxxx }
                   label: { description: Label, type: string }
                   qrcode: { description: 'QR Code associated to the short link', properties: { data: { description: 'QR Code Data URL', type: string } }, type: object }
@@ -130,6 +130,7 @@ paths:
                   created_at: { description: 'Creation date', type: string, format: date-time }
                   updated_at: { description: 'Modification date', type: string, format: date-time }
                   expired_at: { description: 'Expiration date', type: string, format: date-time }
+                  expired_url: { description: 'Expiration URL', type: string, format: url }
                 type: object
         '404':
           description: 'Not Found'
@@ -193,6 +194,11 @@ paths:
                   description: 'Folder API ID'
                   type: string
                   format: uuid
+                domain:
+                  description: Domain
+                  type: string
+                  format: hostname
+                  example: mybrand.com
                 code:
                   description: 'Custom short code'
                   type: string
@@ -206,7 +212,7 @@ paths:
                   type: string
                 qrcode:
                   description: 'QR Code'
-                  properties: { size: { description: 'The size of the QR code (px)', type: integer, default: 600 }, format: { description: 'The format of the QR code', type: string, default: png, enum: [png, webp, svg] }, margin: { description: 'The margin around the QR code (px)', type: integer, default: 0 }, background_color: { description: 'The background color of the QR code (hexadecimal)', type: string, default: '#ffffff' }, foreground_color: { description: 'The foreground color of the QR code (hexadecimal)', type: string, default: '#000000' } }
+                  properties: { size: { description: 'The size of the QR code (px)', type: integer, default: 600, maximum: 1000, minimum: 100 }, format: { description: 'The format of the QR code', type: string, default: png, enum: [png, webp, svg] }, margin: { description: 'The margin around the QR code (px)', type: integer, default: 0 }, background_color: { description: 'The background color of the QR code (hexadecimal)', type: string, default: '#ffffff' }, foreground_color: { description: 'The foreground color of the QR code (hexadecimal)', type: string, default: '#000000' } }
                   type: object
                 metatag:
                   description: 'Custom metadata for social previews'
@@ -216,6 +222,10 @@ paths:
                   description: 'Expiration date'
                   type: string
                   format: date-time
+                expired_url:
+                  description: 'Expiration URL'
+                  type: string
+                  format: url
               type: object
       responses:
         '201':
@@ -228,7 +238,7 @@ paths:
                   url: { description: 'Original URL', type: string }
                   team: { description: 'Team API ID', type: string, format: uuid }
                   folder_id: { description: 'Folder API ID', type: string, format: uuid }
-                  domain: { description: Domain, type: string, example: urlr.me }
+                  domain: { description: Domain, type: string, format: hostname, example: urlr.me }
                   code: { description: 'Short code', type: string, example: xxxxx }
                   label: { description: Label, type: string }
                   qrcode: { description: 'QR Code associated to the short link', properties: { data: { description: 'QR Code Data URL', type: string } }, type: object }
@@ -237,6 +247,7 @@ paths:
                   created_at: { description: 'Creation date', type: string, format: date-time }
                   updated_at: { description: 'Modification date', type: string, format: date-time }
                   expired_at: { description: 'Expiration date', type: string, format: date-time }
+                  expired_url: { description: 'Expiration URL', type: string, format: url }
                 type: object
         '401':
           description: Unauthorized
@@ -301,6 +312,8 @@ paths:
                   description: 'The size of the QR code (px)'
                   type: integer
                   default: 600
+                  maximum: 1000
+                  minimum: 100
                 format:
                   description: 'The format of the QR code'
                   type: string

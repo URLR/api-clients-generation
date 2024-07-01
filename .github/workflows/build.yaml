@@ -32,7 +32,7 @@ jobs:
             git tag -a $PACKAGE_VERSION -m $PACKAGE_VERSION || true
             git push --tags origin main
             npm config set //registry.npmjs.org/:_authToken $NODE_AUTH_TOKEN
-            npm publish --provenance
+            npm publish
           else
             echo "  No changes, skipping."
           fi
