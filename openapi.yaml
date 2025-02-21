@@ -10,7 +10,7 @@ info:
   license:
     name: 'All rights reserved'
     url: 'https://urlr.me/en/legal-notice'
-  version: '1.4'
+  version: '1.5'
 servers:
   -
     url: 'https://urlr.me/api/v1'
@@ -132,6 +132,7 @@ paths:
                   updated_at: { description: 'Modification date', type: string, format: date-time }
                   expired_at: { description: 'Expiration date', type: string, format: date-time }
                   expired_url: { description: 'Expiration URL', type: string, format: url }
+                  delete_after_expiration: { description: 'Whether or not to remove the link after the expiry date', type: boolean, default: false }
                 type: object
         '404':
           description: 'Not Found'
@@ -187,6 +188,7 @@ paths:
                 url:
                   description: 'URL to shorten'
                   type: string
+                  maxLength: 4096
                 team_id:
                   description: 'Team API ID'
                   type: string
@@ -231,6 +233,10 @@ paths:
                   description: 'Expiration URL'
                   type: string
                   format: url
+                delete_after_expiration:
+                  description: 'Whether or not to remove the link after the expiry date'
+                  type: boolean
+                  default: false
               type: object
       responses:
         '201':
@@ -254,6 +260,7 @@ paths:
                   updated_at: { description: 'Modification date', type: string, format: date-time }
                   expired_at: { description: 'Expiration date', type: string, format: date-time }
                   expired_url: { description: 'Expiration URL', type: string, format: url }
+                  delete_after_expiration: { description: 'Whether or not to remove the link after the expiry date', type: boolean, default: false }
                 type: object
         '401':
           description: Unauthorized
