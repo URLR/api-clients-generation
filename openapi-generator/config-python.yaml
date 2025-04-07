@@ -3,6 +3,7 @@ packageName: urlr
 packageVersion: 2.7.0
 infoName: URLR
 infoEmail: contact@urlr.me
+gitHost: github.com
 gitUserId: urlr
 gitRepoId: urlr-python
 templateDir: openapi-generator/templates/python

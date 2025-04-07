@@ -8,8 +8,10 @@
     "url": "https://{{gitHost}}/{{gitUserId}}/{{gitRepoId}}.git"
   },
   "homepage": "https://urlr.me/en",
-  "license": "MIT",
   "keywords": ["link shortener", "api", "sdk", "client"],
+{{#licenseName}}
+  "license": "{{licenseName}}",
+{{/licenseName}}
 {{#packageAsSourceOnlyLibrary}}
   "main": "./index.ts",
 {{/packageAsSourceOnlyLibrary}}

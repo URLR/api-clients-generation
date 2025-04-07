@@ -4,3 +4,4 @@ gitHost: github.com
 gitUserId: urlr
 gitRepoId: urlr-javascript
 templateDir: openapi-generator/templates/typescript-fetch
+licenseName: MIT

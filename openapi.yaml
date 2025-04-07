@@ -10,7 +10,7 @@ info:
   license:
     name: 'All rights reserved'
     url: 'https://urlr.me/en/legal-notice'
-  version: '1.5'
+  version: '1.7'
 servers:
   -
     url: 'https://urlr.me/api/v1'
@@ -124,13 +124,15 @@ paths:
                   domain: { description: Domain, type: string, format: hostname, example: urlr.me }
                   code: { description: 'Short code', type: string, example: xxxxx }
                   label: { description: Label, type: string }
+                  tags: { description: Tags, type: array, items: { properties: { id: { description: ID, type: string, format: uuid }, name: { description: Name, type: string } }, type: object }, maxItems: 3 }
                   qrcode: { description: 'QR Code associated to the short link', properties: { data: { description: 'QR Code Data URL', type: string } }, type: object }
                   utm: { description: 'UTM parameters', properties: { campaign: { description: utm_campaign, type: string, maxLength: 255 }, medium: { description: utm_medium, type: string, maxLength: 255 }, source: { description: utm_source, type: string, maxLength: 255 }, content: { description: utm_content, type: string, maxLength: 255 } }, type: object }
                   metatag: { description: 'Custom metadata for social previews', properties: { title: { description: 'Title of the link', type: string, maxLength: 255 }, description: { description: 'Description of the link', type: string, maxLength: 255 }, image: { description: 'Image URL of the link', type: string, format: url } }, type: object }
                   geolinks: { description: 'Geographical targeting links', type: array, items: { properties: { type: { description: 'Type of the geographic link', type: string }, value: { description: 'Value corresponding to the type of the geographic link', type: string }, url: { description: 'URL of the geographic link', type: string, format: url } }, type: object } }
                   created_at: { description: 'Creation date', type: string, format: date-time }
                   updated_at: { description: 'Modification date', type: string, format: date-time }
-                  expired_at: { description: 'Expiration date', type: string, format: date-time }
+                  delete_at: { description: 'Scheduled deletion date', type: string, format: date-time }
+                  expired_at: { description: 'Scheduled expiration date', type: string, format: date-time }
                   expired_url: { description: 'Expiration URL', type: string, format: url }
                   delete_after_expiration: { description: 'Whether or not to remove the link after the expiry date', type: boolean, default: false }
                 type: object
@@ -210,6 +212,11 @@ paths:
                 label:
                   description: Label
                   type: string
+                '':
+                  description: Tags
+                  type: array
+                  items: { type: string, format: uuid }
+                  maxItems: 3
                 password:
                   description: Password
                   type: string
@@ -225,8 +232,12 @@ paths:
                   description: 'Custom metadata for social previews'
                   properties: { title: { description: 'Title for the link', type: string, maxLength: 255 }, description: { description: 'Description for the link', type: string, maxLength: 255 }, image: { description: 'Image URL for the link. Recommended: 1200X630px<br>Maximum size: 3Mb - Formats: PNG, JPEG, WebP and GIF.', type: string, format: url } }
                   type: object
+                delete_at:
+                  description: 'Scheduled deletion date'
+                  type: string
+                  format: date-time
                 expired_at:
-                  description: 'Expiration date'
+                  description: 'Scheduled expiration date'
                   type: string
                   format: date-time
                 expired_url:
@@ -252,13 +263,15 @@ paths:
                   domain: { description: Domain, type: string, format: hostname, example: urlr.me }
                   code: { description: 'Short code', type: string, example: xxxxx }
                   label: { description: Label, type: string }
+                  tags: { description: Tags, type: array, items: { properties: { id: { description: ID, type: string, format: uuid }, name: { description: Name, type: string } }, type: object }, maxItems: 3 }
                   qrcode: { description: 'QR Code associated to the short link', properties: { data: { description: 'QR Code Data URL', type: string } }, type: object }
                   utm: { description: 'UTM parameters', properties: { campaign: { description: utm_campaign, type: string, maxLength: 255 }, medium: { description: utm_medium, type: string, maxLength: 255 }, source: { description: utm_source, type: string, maxLength: 255 }, content: { description: utm_content, type: string, maxLength: 255 } }, type: object }
                   metatag: { description: 'Custom metadata for social previews', properties: { title: { description: 'Title of the link', type: string, maxLength: 255 }, description: { description: 'Description of the link', type: string, maxLength: 255 }, image: { description: 'Image URL of the link', type: string, format: url } }, type: object }
                   geolinks: { description: 'Geographical targeting links', type: array, items: { properties: { type: { description: 'Type of the geographic link', type: string }, value: { description: 'Value corresponding to the type of the geographic link', type: string }, url: { description: 'URL of the geographic link', type: string, format: url } }, type: object } }
                   created_at: { description: 'Creation date', type: string, format: date-time }
                   updated_at: { description: 'Modification date', type: string, format: date-time }
-                  expired_at: { description: 'Expiration date', type: string, format: date-time }
+                  delete_at: { description: 'Scheduled deletion date', type: string, format: date-time }
+                  expired_at: { description: 'Scheduled expiration date', type: string, format: date-time }
                   expired_url: { description: 'Expiration URL', type: string, format: url }
                   delete_after_expiration: { description: 'Whether or not to remove the link after the expiry date', type: boolean, default: false }
                 type: object
