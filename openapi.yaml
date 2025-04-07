@@ -212,7 +212,7 @@ paths:
                 label:
                   description: Label
                   type: string
-                '':
+                tags:
                   description: Tags
                   type: array
                   items: { type: string, format: uuid }
