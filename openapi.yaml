@@ -10,7 +10,7 @@ info:
   license:
     name: 'All rights reserved'
     url: 'https://urlr.me/en/legal-notice'
-  version: '1.7'
+  version: '1.9'
 servers:
   -
     url: 'https://urlr.me/api/v1'
@@ -128,7 +128,7 @@ paths:
                   qrcode: { description: 'QR Code associated to the short link', properties: { data: { description: 'QR Code Data URL', type: string } }, type: object }
                   utm: { description: 'UTM parameters', properties: { campaign: { description: utm_campaign, type: string, maxLength: 255 }, medium: { description: utm_medium, type: string, maxLength: 255 }, source: { description: utm_source, type: string, maxLength: 255 }, content: { description: utm_content, type: string, maxLength: 255 } }, type: object }
                   metatag: { description: 'Custom metadata for social previews', properties: { title: { description: 'Title of the link', type: string, maxLength: 255 }, description: { description: 'Description of the link', type: string, maxLength: 255 }, image: { description: 'Image URL of the link', type: string, format: url } }, type: object }
-                  geolinks: { description: 'Geographical targeting links', type: array, items: { properties: { type: { description: 'Type of the geographic link', type: string }, value: { description: 'Value corresponding to the type of the geographic link', type: string }, url: { description: 'URL of the geographic link', type: string, format: url } }, type: object } }
+                  geolinks: { description: 'Dynamic routing conditions', type: array, items: { properties: { conditions: { description: 'Conditions for dynamic routing', type: array, items: { properties: { type: { description: 'Type of the condition ', type: string, enum: [country, language, system] }, value: { description: 'Value for the given type. Allowed values depend on "type": e.g., "US", "DE", "FR" for type "country"; "en", "fr", "de" for type "language"; "Android", "iOS" for type "system".', type: string }, operator: { description: 'Operator to apply for the condition', type: string, enum: [AND, OR] } }, type: object } }, url: { description: 'URL to redirect to when conditions match', type: string, format: url } }, type: object } }
                   created_at: { description: 'Creation date', type: string, format: date-time }
                   updated_at: { description: 'Modification date', type: string, format: date-time }
                   delete_at: { description: 'Scheduled deletion date', type: string, format: date-time }
@@ -232,6 +232,10 @@ paths:
                   description: 'Custom metadata for social previews'
                   properties: { title: { description: 'Title for the link', type: string, maxLength: 255 }, description: { description: 'Description for the link', type: string, maxLength: 255 }, image: { description: 'Image URL for the link. Recommended: 1200X630px<br>Maximum size: 3Mb - Formats: PNG, JPEG, WebP and GIF.', type: string, format: url } }
                   type: object
+                geolinks:
+                  description: 'Dynamic routing conditions'
+                  type: array
+                  items: { properties: { conditions: { description: 'Conditions for dynamic routing', type: array, items: { properties: { type: { description: 'Type of the condition ', type: string, enum: [country, language, system] }, value: { description: 'Value for the given type. Allowed values depend on "type": e.g., "US", "DE", "FR" for type "country"; "en", "fr", "de" for type "language"; "Android", "iOS" for type "system".', type: string }, operator: { description: 'Operator to apply for the condition', type: string, enum: [AND, OR] } }, type: object } }, url: { description: 'URL to redirect to when conditions match', type: string, format: url } }, type: object }
                 delete_at:
                   description: 'Scheduled deletion date'
                   type: string
@@ -267,7 +271,7 @@ paths:
                   qrcode: { description: 'QR Code associated to the short link', properties: { data: { description: 'QR Code Data URL', type: string } }, type: object }
                   utm: { description: 'UTM parameters', properties: { campaign: { description: utm_campaign, type: string, maxLength: 255 }, medium: { description: utm_medium, type: string, maxLength: 255 }, source: { description: utm_source, type: string, maxLength: 255 }, content: { description: utm_content, type: string, maxLength: 255 } }, type: object }
                   metatag: { description: 'Custom metadata for social previews', properties: { title: { description: 'Title of the link', type: string, maxLength: 255 }, description: { description: 'Description of the link', type: string, maxLength: 255 }, image: { description: 'Image URL of the link', type: string, format: url } }, type: object }
-                  geolinks: { description: 'Geographical targeting links', type: array, items: { properties: { type: { description: 'Type of the geographic link', type: string }, value: { description: 'Value corresponding to the type of the geographic link', type: string }, url: { description: 'URL of the geographic link', type: string, format: url } }, type: object } }
+                  geolinks: { description: 'Dynamic routing conditions', type: array, items: { properties: { conditions: { description: 'Conditions for dynamic routing', type: array, items: { properties: { type: { description: 'Type of the condition ', type: string, enum: [country, language, system] }, value: { description: 'Value for the given type. Allowed values depend on "type": e.g., "US", "DE", "FR" for type "country"; "en", "fr", "de" for type "language"; "Android", "iOS" for type "system".', type: string }, operator: { description: 'Operator to apply for the condition', type: string, enum: [AND, OR] } }, type: object } }, url: { description: 'URL to redirect to when conditions match', type: string, format: url } }, type: object } }
                   created_at: { description: 'Creation date', type: string, format: date-time }
                   updated_at: { description: 'Modification date', type: string, format: date-time }
                   delete_at: { description: 'Scheduled deletion date', type: string, format: date-time }
@@ -456,10 +460,6 @@ paths:
                   description: 'Get statistics until this date'
                   type: string
                   format: date-time
-                include_bots:
-                  description: 'Whether include bots or not in statistics'
-                  type: boolean
-                  default: false
               type: object
       responses:
         '200':
@@ -598,6 +598,78 @@ paths:
       security:
         -
           bearerAuth: []
+  /domains/create:
+    post:
+      tags:
+        - Domains
+      summary: 'Create a domain'
+      operationId: createDomain
+      requestBody:
+        description: 'You can use this endpoint to add a custom domain to URLR.'
+        content:
+          application/json:
+            schema:
+              required:
+                - team_id
+                - domain
+              properties:
+                team_id:
+                  description: 'Team API ID'
+                  type: string
+                  format: uuid
+                domain:
+                  description: Domain
+                  type: string
+                  format: hostname
+                  example: mybrand.com
+                root_url:
+                  description: 'Redirect URL for the root of the domain'
+                  type: string
+                  format: url
+              type: object
+      responses:
+        '200':
+          description: Domain
+          content:
+            application/json:
+              schema:
+                properties:
+                  domain: { description: Domain, type: string, format: hostname, example: mybrand.com }
+                  root_url: { description: 'Redirect URL for the root of the domain', type: string, format: url }
+                type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 401 }
+                  detail: { type: string }
+                type: object
+        '429':
+          description: 'Limits Exceeded'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 429 }
+                  detail: { type: string }
+                type: object
+        '409':
+          description: Conflict
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 409 }
+                  detail: { type: string }
+                type: object
 components:
   securitySchemes:
     bearerAuth:
@@ -623,3 +695,6 @@ tags:
   -
     name: Folders
     description: Folders
+  -
+    name: Domains
+    description: Domains

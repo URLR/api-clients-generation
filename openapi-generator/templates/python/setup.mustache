@@ -34,16 +34,16 @@ REQUIRES = [
 setup(
     name=NAME,
     version=VERSION,
-    description="Python client for URLR",
+    description="{{appName}}",
     author="{{infoName}}{{^infoName}}OpenAPI Generator community{{/infoName}}",
     author_email="{{infoEmail}}{{^infoEmail}}team@openapitools.org{{/infoEmail}}",
     url="{{packageUrl}}",
-    keywords=["link shortener", "api", "sdk", "client"],
+    keywords=["OpenAPI", "OpenAPI-Generator", "{{{appName}}}"],
     install_requires=REQUIRES,
     packages=find_packages(exclude=["test", "tests"]),
     include_package_data=True,
-    license="MIT",
-    long_description_content_type='text/markdown',
+    {{#licenseInfo}}license="{{.}}",
+    {{/licenseInfo}}long_description_content_type='text/markdown',
     long_description="""\
     {{appDescription}}
     """,  # noqa: E501
