@@ -95,7 +95,7 @@ jobs:
             git tag -a $PACKAGE_VERSION -m $PACKAGE_VERSION || true
             git push --tags origin main
             python -m pip install --upgrade pip
-            pip install twine build
+            pip install --upgrade build twine
             python -m build
             twine upload dist/*
           else
