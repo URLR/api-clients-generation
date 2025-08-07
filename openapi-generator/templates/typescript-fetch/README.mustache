@@ -63,29 +63,37 @@ yarn install {{npmName}}@{{npmVersion}}
 Please follow the [installation](#installation) procedure and then run the following code:
 
 ```javascript
-import { Configuration, AccessTokensApi, LinksApi } from "urlr-js"
+import { Configuration, AccessTokensApi, LinksApi, StatisticsApi, WorkspacesApi } from "urlr-js"
+
+const username = process.env.URLR_API_USERNAME; // to be defined on your side
+const password = process.env.URLR_API_PASSWORD; // to be defined on your side
 
 // Access Tokens
 
-const accessTokensApi = new AccessTokensApi();
+let configuration = new Configuration();
+
+const accessTokensApi = new AccessTokensApi(configuration);
 accessTokensApi.createAccessToken({
-  accessTokensRequest: {
-    username: '',
-    password: ''
+  createAccessTokenRequest: {
+    username: username,
+    password: password,
   }
 }).then(function (data) {
-  const configuration = new Configuration({ accessToken: data.token });
+  configuration = new Configuration({
+    accessToken: data.token,
+    basePath: baseUrl
+  });
 
-  // Link shortening
+  // Create a link
 
   const linksApi = new LinksApi(configuration);
   linksApi.createLink({
     createLinkRequest: {
       url: '',
-      teamId: ''
+      teamId: '',
     }
-  }).then(function (data) {
-    console.log(data)
+  }).then(function (link) {
+      console.log(link);
   }).catch((error) => console.error(error));
 }).catch((error) => console.error(error));
 ```
