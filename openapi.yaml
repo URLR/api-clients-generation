@@ -192,7 +192,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LinkEditRequest'
+              $ref: '#/components/schemas/EditLinkRequest'
       responses:
         '200':
           description: Link
@@ -266,7 +266,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LinkCreateRequest'
+              $ref: '#/components/schemas/CreateLinkRequest'
       responses:
         '201':
           description: Link
@@ -686,7 +686,7 @@ paths:
                 type: object
 components:
   schemas:
-    LinkBaseRequest:
+    BaseLinkRequest:
       properties:
         url:
           description: 'URL to shorten'
@@ -818,7 +818,7 @@ components:
           type: boolean
           default: false
       type: object
-    LinkCreateRequest:
+    CreateLinkRequest:
       allOf:
         -
           required:
@@ -831,11 +831,11 @@ components:
               format: uuid
           type: object
         -
-          $ref: '#/components/schemas/LinkBaseRequest'
-    LinkEditRequest:
+          $ref: '#/components/schemas/BaseLinkRequest'
+    EditLinkRequest:
       allOf:
         -
-          $ref: '#/components/schemas/LinkBaseRequest'
+          $ref: '#/components/schemas/BaseLinkRequest'
   securitySchemes:
     bearerAuth:
       type: http

@@ -78,7 +78,7 @@ $createLinkRequest = new \URLR\Model\CreateLinkRequest([
 ]); // \URLR\Model\CreateLinkRequest | Infos of the link to shorten
 
 try {
-    $result = $apiInstance->createLink($createLinkRequest);
+    $result = $linksApi->createLink($createLinkRequest);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling LinksApi->createLink: ', $e->getMessage(), PHP_EOL;
