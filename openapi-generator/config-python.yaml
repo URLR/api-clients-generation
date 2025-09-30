@@ -7,4 +7,3 @@ gitHost: github.com
 gitUserId: urlr
 gitRepoId: urlr-python
 templateDir: openapi-generator/templates/python
-licenseInfo: MIT
