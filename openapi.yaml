@@ -10,7 +10,7 @@ info:
   license:
     name: 'All rights reserved'
     url: 'https://urlr.me/en/legal-notice'
-  version: '1.10'
+  version: '1.12'
 servers:
   -
     url: 'https://urlr.me/api/v1'
@@ -116,26 +116,7 @@ paths:
           content:
             application/json:
               schema:
-                properties:
-                  id: { description: 'Link API ID', type: string, format: uuid, example: 436b5d20-e174-4363-94e5-2b3dd4e74b5f }
-                  url: { description: 'Original URL', type: string }
-                  team_id: { description: 'Workspace API ID', type: string, format: uuid }
-                  folder_id: { description: 'Folder API ID', type: string, format: uuid }
-                  domain: { description: Domain, type: string, format: hostname, example: urlr.me }
-                  code: { description: 'Short code', type: string, example: xxxxx }
-                  label: { description: Label, type: string }
-                  tags: { description: Tags, type: array, items: { properties: { id: { description: ID, type: string, format: uuid }, name: { description: Name, type: string } }, type: object }, maxItems: 3 }
-                  qrcode: { description: 'QR Code associated to the short link', properties: { data: { description: 'QR Code Data URL', type: string } }, type: object }
-                  utm: { description: 'UTM parameters', properties: { campaign: { description: utm_campaign, type: string, maxLength: 255 }, medium: { description: utm_medium, type: string, maxLength: 255 }, source: { description: utm_source, type: string, maxLength: 255 }, content: { description: utm_content, type: string, maxLength: 255 } }, type: object }
-                  metatag: { description: 'Custom metadata for social previews', properties: { title: { description: 'Title of the link', type: string, maxLength: 255 }, description: { description: 'Description of the link', type: string, maxLength: 255 }, image: { description: 'Image URL of the link', type: string, format: url } }, type: object }
-                  geolinks: { description: 'Dynamic routing conditions', type: array, items: { properties: { conditions: { description: 'Conditions for dynamic routing', type: array, items: { properties: { type: { description: 'Type of the condition ', type: string, enum: [country, language, system] }, value: { description: 'Value for the given type. Allowed values depend on "type": e.g., "US", "DE", "FR" for type "country"; "en", "fr", "de" for type "language"; "Android", "iOS" for type "system".', type: string }, operator: { description: 'Operator to apply for the condition', type: string, enum: [AND, OR] } }, type: object } }, url: { description: 'URL to redirect to when conditions match', type: string, format: url } }, type: object } }
-                  created_at: { description: 'Creation date', type: string, format: date-time }
-                  updated_at: { description: 'Modification date', type: string, format: date-time }
-                  delete_at: { description: 'Scheduled deletion date', type: string, format: date-time }
-                  expired_at: { description: 'Scheduled expiration date', type: string, format: date-time }
-                  expired_url: { description: 'Expiration URL', type: string, format: url }
-                  delete_after_expiration: { description: 'Whether or not to remove the link after the expiry date', type: boolean, default: false }
-                type: object
+                $ref: '#/components/schemas/Link'
         '404':
           description: 'Not Found'
           content:
@@ -199,26 +180,7 @@ paths:
           content:
             application/json:
               schema:
-                properties:
-                  id: { description: 'Link API ID', type: string, format: uuid, example: 436b5d20-e174-4363-94e5-2b3dd4e74b5f }
-                  url: { description: 'Original URL', type: string }
-                  team_id: { description: 'Workspace API ID', type: string, format: uuid }
-                  folder_id: { description: 'Folder API ID', type: string, format: uuid }
-                  domain: { description: Domain, type: string, format: hostname, example: urlr.me }
-                  code: { description: 'Short code', type: string, example: xxxxx }
-                  label: { description: Label, type: string }
-                  tags: { description: Tags, type: array, items: { properties: { id: { description: ID, type: string, format: uuid }, name: { description: Name, type: string } }, type: object }, maxItems: 3 }
-                  qrcode: { description: 'QR Code associated to the short link', properties: { data: { description: 'QR Code Data URL', type: string } }, type: object }
-                  utm: { description: 'UTM parameters', properties: { campaign: { description: utm_campaign, type: string, maxLength: 255 }, medium: { description: utm_medium, type: string, maxLength: 255 }, source: { description: utm_source, type: string, maxLength: 255 }, content: { description: utm_content, type: string, maxLength: 255 } }, type: object }
-                  metatag: { description: 'Custom metadata for social previews', properties: { title: { description: 'Title of the link', type: string, maxLength: 255 }, description: { description: 'Description of the link', type: string, maxLength: 255 }, image: { description: 'Image URL of the link', type: string, format: url } }, type: object }
-                  geolinks: { description: 'Dynamic routing conditions', type: array, items: { properties: { conditions: { description: 'Conditions for dynamic routing', type: array, items: { properties: { type: { description: 'Type of the condition ', type: string, enum: [country, language, system] }, value: { description: 'Value for the given type. Allowed values depend on "type": e.g., "US", "DE", "FR" for type "country"; "en", "fr", "de" for type "language"; "Android", "iOS" for type "system".', type: string }, operator: { description: 'Operator to apply for the condition', type: string, enum: [AND, OR] } }, type: object } }, url: { description: 'URL to redirect to when conditions match', type: string, format: url } }, type: object } }
-                  created_at: { description: 'Creation date', type: string, format: date-time }
-                  updated_at: { description: 'Modification date', type: string, format: date-time }
-                  delete_at: { description: 'Scheduled deletion date', type: string, format: date-time }
-                  expired_at: { description: 'Scheduled expiration date', type: string, format: date-time }
-                  expired_url: { description: 'Expiration URL', type: string, format: url }
-                  delete_after_expiration: { description: 'Whether or not to remove the link after the expiry date', type: boolean, default: false }
-                type: object
+                $ref: '#/components/schemas/Link'
         '401':
           description: Unauthorized
           content:
@@ -255,6 +217,100 @@ paths:
       security:
         -
           bearerAuth: []
+  /links:
+    get:
+      tags:
+        - Links
+      summary: 'List links'
+      operationId: listLinks
+      parameters:
+        -
+          name: team_id
+          in: query
+          description: 'Filter by Workspace API ID'
+          schema:
+            type: string
+            format: uuid
+        -
+          name: folder_id
+          in: query
+          description: 'Filter by Folder API ID'
+          schema:
+            type: string
+            format: uuid
+        -
+          name: tag_id
+          in: query
+          description: 'Filter by Tag API ID'
+          schema:
+            type: string
+            format: uuid
+        -
+          name: limit
+          in: query
+          description: 'Number of items per page'
+          schema:
+            type: integer
+            default: 10
+            maximum: 50
+            minimum: 10
+        -
+          name: page
+          in: query
+          description: 'Page number'
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+      responses:
+        '200':
+          description: 'List of links'
+          content:
+            application/json:
+              schema:
+                properties:
+                  links: { description: 'List of links', type: array, items: { $ref: '#/components/schemas/Link' } }
+                  total: { description: 'Total number of links', type: integer }
+                  limit: { description: 'Number of items per page', type: integer }
+                  pages: { description: 'Total number of pages', type: integer }
+                  page: { description: 'Current page number', type: integer }
+                type: object
+        '422':
+          description: 'Validation Failed'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 422 }
+                  detail: { type: string }
+                type: object
+        '404':
+          description: 'Not Found'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 404 }
+                  detail: { type: string }
+                type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 401 }
+                  detail: { type: string }
+                type: object
+      security:
+        -
+          bearerAuth: []
   /links/create:
     post:
       tags:
@@ -273,26 +329,7 @@ paths:
           content:
             application/json:
               schema:
-                properties:
-                  id: { description: 'Link API ID', type: string, format: uuid, example: 436b5d20-e174-4363-94e5-2b3dd4e74b5f }
-                  url: { description: 'Original URL', type: string }
-                  team_id: { description: 'Workspace API ID', type: string, format: uuid }
-                  folder_id: { description: 'Folder API ID', type: string, format: uuid }
-                  domain: { description: Domain, type: string, format: hostname, example: urlr.me }
-                  code: { description: 'Short code', type: string, example: xxxxx }
-                  label: { description: Label, type: string }
-                  tags: { description: Tags, type: array, items: { properties: { id: { description: ID, type: string, format: uuid }, name: { description: Name, type: string } }, type: object }, maxItems: 3 }
-                  qrcode: { description: 'QR Code associated to the short link', properties: { data: { description: 'QR Code Data URL', type: string } }, type: object }
-                  utm: { description: 'UTM parameters', properties: { campaign: { description: utm_campaign, type: string, maxLength: 255 }, medium: { description: utm_medium, type: string, maxLength: 255 }, source: { description: utm_source, type: string, maxLength: 255 }, content: { description: utm_content, type: string, maxLength: 255 } }, type: object }
-                  metatag: { description: 'Custom metadata for social previews', properties: { title: { description: 'Title of the link', type: string, maxLength: 255 }, description: { description: 'Description of the link', type: string, maxLength: 255 }, image: { description: 'Image URL of the link', type: string, format: url } }, type: object }
-                  geolinks: { description: 'Dynamic routing conditions', type: array, items: { properties: { conditions: { description: 'Conditions for dynamic routing', type: array, items: { properties: { type: { description: 'Type of the condition ', type: string, enum: [country, language, system] }, value: { description: 'Value for the given type. Allowed values depend on "type": e.g., "US", "DE", "FR" for type "country"; "en", "fr", "de" for type "language"; "Android", "iOS" for type "system".', type: string }, operator: { description: 'Operator to apply for the condition', type: string, enum: [AND, OR] } }, type: object } }, url: { description: 'URL to redirect to when conditions match', type: string, format: url } }, type: object } }
-                  created_at: { description: 'Creation date', type: string, format: date-time }
-                  updated_at: { description: 'Modification date', type: string, format: date-time }
-                  delete_at: { description: 'Scheduled deletion date', type: string, format: date-time }
-                  expired_at: { description: 'Scheduled expiration date', type: string, format: date-time }
-                  expired_url: { description: 'Expiration URL', type: string, format: url }
-                  delete_after_expiration: { description: 'Whether or not to remove the link after the expiry date', type: boolean, default: false }
-                type: object
+                $ref: '#/components/schemas/Link'
         '401':
           description: Unauthorized
           content:
@@ -612,6 +649,83 @@ paths:
       security:
         -
           bearerAuth: []
+  /folders/create:
+    post:
+      tags:
+        - Folders
+      summary: 'Create a folder'
+      operationId: createFolder
+      requestBody:
+        description: 'You can use this endpoint to add a folder to URLR.'
+        content:
+          application/json:
+            schema:
+              required:
+                - team_id
+                - name
+              properties:
+                team_id:
+                  description: 'Team API ID'
+                  type: string
+                  format: uuid
+                name:
+                  description: Name
+                  type: string
+                parent_id:
+                  description: 'Folder API ID (if any)'
+                  type: string
+                  format: uuid
+                color:
+                  description: 'Color of folder'
+                  type: string
+                  enum: [blue, green, orange, purple, red, rose, yellow, black]
+              type: object
+      responses:
+        '200':
+          description: Folder
+          content:
+            application/json:
+              schema:
+                properties:
+                  team_id: { description: 'Team API ID', type: string, format: uuid }
+                  name: { description: Name, type: string }
+                  parent_id: { description: 'Parent Folder API ID (if any)', type: string, format: uuid }
+                  parent_name: { description: 'Parent Folder name (if any)', type: string }
+                  color: { description: 'Color of folder', type: string, enum: [48aefa, 2bcbba, fa8231, cd84f1, e74c3c, ff9ff3, ffdd59, 2b2b2b] }
+                type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 401 }
+                  detail: { type: string }
+                type: object
+        '429':
+          description: 'Limits Exceeded'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 429 }
+                  detail: { type: string }
+                type: object
+        '409':
+          description: Conflict
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 409 }
+                  detail: { type: string }
+                type: object
   /domains/create:
     post:
       tags:
@@ -686,6 +800,138 @@ paths:
                 type: object
 components:
   schemas:
+    Link:
+      properties:
+        id:
+          description: 'Link API ID'
+          type: string
+          format: uuid
+          example: 436b5d20-e174-4363-94e5-2b3dd4e74b5f
+        url:
+          description: 'Original URL'
+          type: string
+        team_id:
+          description: 'Workspace API ID'
+          type: string
+          format: uuid
+        folder_id:
+          description: 'Folder API ID'
+          type: string
+          format: uuid
+        domain:
+          description: Domain
+          type: string
+          format: hostname
+          example: urlr.me
+        code:
+          description: 'Short code'
+          type: string
+          example: xxxxx
+        label:
+          description: Label
+          type: string
+        tags:
+          description: Tags
+          type: array
+          items:
+            properties:
+              id:
+                description: ID
+                type: string
+                format: uuid
+              name:
+                description: Name
+                type: string
+            type: object
+          maxItems: 3
+        password:
+          description: 'Password: "**********" means a password exists; null means no password.'
+          type: string
+          example: '**********'
+        qrcode:
+          description: 'QR Code associated to the short link'
+          properties:
+            data:
+              description: 'QR Code Data URL'
+              type: string
+          type: object
+        utm:
+          description: 'UTM parameters'
+          properties:
+            campaign:
+              description: utm_campaign
+              type: string
+              maxLength: 255
+            medium:
+              description: utm_medium
+              type: string
+              maxLength: 255
+            source:
+              description: utm_source
+              type: string
+              maxLength: 255
+            content:
+              description: utm_content
+              type: string
+              maxLength: 255
+          type: object
+        metatag:
+          description: 'Custom metadata for social previews'
+          properties:
+            title:
+              description: 'Title of the link'
+              type: string
+              maxLength: 255
+            description:
+              description: 'Description of the link'
+              type: string
+              maxLength: 255
+            image:
+              description: 'Image URL of the link'
+              type: string
+              format: url
+          type: object
+        geolinks:
+          description: 'Dynamic routing conditions'
+          type: array
+          items:
+            properties:
+              conditions:
+                description: 'Conditions for dynamic routing'
+                type: array
+                items:
+                  properties: { type: { description: 'Type of the condition ', type: string, enum: [country, language, system] }, value: { description: 'Value for the given type. Allowed values depend on "type": e.g., "US", "DE", "FR" for type "country"; "en", "fr", "de" for type "language"; "Android", "iOS" for type "system".', type: string }, operator: { description: 'Operator to apply for the condition', type: string, enum: [AND, OR] } }
+                  type: object
+              url:
+                description: 'URL to redirect to when conditions match'
+                type: string
+                format: url
+            type: object
+        created_at:
+          description: 'Creation date'
+          type: string
+          format: date-time
+        updated_at:
+          description: 'Modification date'
+          type: string
+          format: date-time
+        delete_at:
+          description: 'Scheduled deletion date'
+          type: string
+          format: date-time
+        expired_at:
+          description: 'Scheduled expiration date'
+          type: string
+          format: date-time
+        expired_url:
+          description: 'Expiration URL'
+          type: string
+          format: url
+        delete_after_expiration:
+          description: 'Whether or not to remove the link after the expiry date'
+          type: boolean
+          default: false
+      type: object
     BaseLinkRequest:
       properties:
         url:
