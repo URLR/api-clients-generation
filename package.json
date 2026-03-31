@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^2.9.0"
+    "@openapitools/openapi-generator-cli": "^2.31.0"
   },
   "scripts": {
     "generate-php": "npx openapi-generator-cli generate -g php-nextgen -o clients/urlr-php -i openapi.yaml -c openapi-generator/config-php.yaml",
