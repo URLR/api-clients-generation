@@ -1,105 +1,427 @@
 openapi: 3.0.0
 info:
   title: 'URLR API Reference'
-  description: "API powering the features of URLR.<br><br>Note that in order to facilitate integration, we provide SDKs for various languages at https://github.com/URLR.<br><br>Key API principles:<br>\n        <ul><li>All dates follow **ISO-8601** format</li><li>Most errors follow **RFC 9457** standard</li><li>All responses are delivered in English</li></ul>"
+  description: "API powering the features of URLR.<br><br>Note that in order to facilitate integration, we provide SDKs for various languages at https://github.com/URLR.<br><br>Key API principles:<br>\n        <ul>\n        <li>All dates follow **ISO-8601** format</li>\n        <li>Most errors follow **RFC 9457** standard</li>\n        <li>All responses are delivered in English</li>\n    </ul>\n    All requests must include an API key generated in your workspace.\n    The key should be provided in the X-API-KEY HTTP header."
   termsOfService: 'https://urlr.me/en/terms-of-use'
   contact:
     name: URLR
     url: 'https://urlr.me/en'
-    email: contact@urlr.me
   license:
     name: 'All rights reserved'
     url: 'https://urlr.me/en/legal-notice'
-  version: '1.12'
+  version: 2.0.0
 servers:
   -
-    url: 'https://urlr.me/api/v1'
+    url: 'https://urlr.me/api/v2'
     description: 'Main API entry point'
 paths:
-  /access_tokens/create:
+  '/domains/{domain_id}':
+    get:
+      tags:
+        - Domains
+      summary: 'Get a domain'
+      operationId: domainGet
+      parameters:
+        -
+          name: domain_id
+          in: path
+          description: 'Domain API ID'
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Domain
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Domain'
+        '404':
+          description: 'Not Found'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 404 }
+                  detail: { type: string }
+                type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 401 }
+                  detail: { type: string }
+                type: object
+        '422':
+          description: 'Validation Failed'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 422 }
+                  detail: { type: string }
+                type: object
+      security:
+        -
+          ApiKeyAuth: []
+  /domains:
+    get:
+      tags:
+        - Domains
+      summary: 'List domains'
+      operationId: domainList
+      responses:
+        '200':
+          description: 'Domains of user'
+          content:
+            application/json:
+              schema:
+                properties:
+                  domains: { type: array, items: { $ref: '#/components/schemas/Domain' } }
+                type: object
+        '404':
+          description: 'Not Found'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 404 }
+                  detail: { type: string }
+                type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 401 }
+                  detail: { type: string }
+                type: object
+        '422':
+          description: 'Validation Failed'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 422 }
+                  detail: { type: string }
+                type: object
+      security:
+        -
+          ApiKeyAuth: []
     post:
       tags:
-        - 'Access Tokens'
-      summary: 'Get an access token'
-      operationId: createAccessToken
+        - Domains
+      summary: 'Create a domain'
+      operationId: domainCreate
       requestBody:
-        description: 'You can use this endpoint to get an access token to access the API.'
+        description: 'You can use this endpoint to add a custom domain to URLR.'
         content:
           application/json:
             schema:
               required:
-                - username
-                - password
+                - domain
               properties:
-                username:
-                  description: Email
+                domain:
+                  description: Domain
                   type: string
-                password:
-                  description: Password
+                  format: hostname
+                  example: mybrand.com
+                  maxLength: 255
+                root_url:
+                  description: 'Redirect URL for the root of the domain'
                   type: string
+                  format: url
               type: object
       responses:
-        '200':
-          description: 'Access token'
+        '201':
+          description: Domain
           content:
             application/json:
               schema:
+                $ref: '#/components/schemas/Domain'
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
                 properties:
-                  token: { description: 'Access token (JWT) valid for 1 hour', type: string }
-                  refresh_token: { description: 'Refresh token valid for 1 month', type: string }
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 401 }
+                  detail: { type: string }
+                type: object
+        '429':
+          description: 'Limits Exceeded'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 429 }
+                  detail: { type: string }
+                type: object
+        '409':
+          description: Conflict
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 409 }
+                  detail: { type: string }
+                type: object
+        '422':
+          description: 'Validation Failed'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 422 }
+                  detail: { type: string }
+                type: object
+      security:
+        -
+          ApiKeyAuth: []
+  '/folders/{folder_id}':
+    get:
+      tags:
+        - Folders
+      summary: 'Get a folder'
+      operationId: folderGet
+      parameters:
+        -
+          name: folder_id
+          in: path
+          description: 'Folder API ID'
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Folder
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Folder'
+        '404':
+          description: 'Not Found'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 404 }
+                  detail: { type: string }
                 type: object
         '401':
-          description: Error
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 401 }
+                  detail: { type: string }
+                type: object
+        '422':
+          description: 'Validation Failed'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 422 }
+                  detail: { type: string }
+                type: object
+      security:
+        -
+          ApiKeyAuth: []
+  /folders:
+    get:
+      tags:
+        - Folders
+      summary: 'List folders'
+      operationId: folderList
+      parameters:
+        -
+          name: workspace_id
+          in: query
+          description: 'Workspace API ID'
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 'Folders of workspace'
           content:
             application/json:
               schema:
                 properties:
-                  code: { type: integer, example: 401 }
-                  message: { type: string, example: 'Invalid credentials.' }
+                  folders: { type: array, items: { $ref: '#/components/schemas/Folder' } }
                 type: object
-  /access_tokens/refresh:
+        '404':
+          description: 'Not Found'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 404 }
+                  detail: { type: string }
+                type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 401 }
+                  detail: { type: string }
+                type: object
+        '422':
+          description: 'Validation Failed'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 422 }
+                  detail: { type: string }
+                type: object
+      security:
+        -
+          ApiKeyAuth: []
     post:
       tags:
-        - 'Access Tokens'
-      summary: 'Refresh an access token'
-      operationId: refreshAccessToken
+        - Folders
+      summary: 'Create a folder'
+      operationId: folderCreate
       requestBody:
-        description: 'You can use this endpoint to refresh your access token without credentials.'
+        description: 'You can use this endpoint to add a folder to URLR.'
         content:
           application/json:
             schema:
               required:
-                - refresh_token
+                - workspace_id
+                - name
               properties:
-                refresh_token:
-                  description: 'Refresh token'
+                workspace_id:
+                  description: 'Workspace API ID'
                   type: string
+                  format: uuid
+                name:
+                  description: Name
+                  type: string
+                  maxLength: 255
+                parent_id:
+                  description: 'Folder API ID'
+                  type: string
+                  format: uuid
+                color:
+                  description: 'Color of folder'
+                  type: string
+                  enum: [blue, green, orange, purple, red, rose, yellow, black]
               type: object
       responses:
-        '200':
-          description: 'Refreshed access token'
+        '201':
+          description: Folder
           content:
             application/json:
               schema:
-                properties:
-                  token: { description: 'Access token (JWT) valid for 1 hour', type: string }
-                  refresh_token: { description: 'Refresh token valid for 1 month', type: string }
-                type: object
+                $ref: '#/components/schemas/Folder'
         '401':
-          description: Error
+          description: Unauthorized
           content:
-            application/json:
+            application/problem+json:
               schema:
                 properties:
-                  code: { type: integer, example: 401 }
-                  message: { type: string, example: 'Missing JWT Refresh Token' }
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 401 }
+                  detail: { type: string }
                 type: object
+        '404':
+          description: 'Not Found'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 404 }
+                  detail: { type: string }
+                type: object
+        '429':
+          description: 'Limits Exceeded'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 429 }
+                  detail: { type: string }
+                type: object
+        '409':
+          description: Conflict
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 409 }
+                  detail: { type: string }
+                type: object
+        '422':
+          description: 'Validation Failed'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 422 }
+                  detail: { type: string }
+                type: object
+      security:
+        -
+          ApiKeyAuth: []
   '/links/{link_id}':
     get:
       tags:
         - Links
       summary: 'Get a link'
-      operationId: getLink
+      operationId: linkGet
       parameters:
         -
           name: link_id
@@ -109,7 +431,6 @@ paths:
           schema:
             type: string
             format: uuid
-            example: ffefc6c4-d970-4373-a867-2a69c8be2c89
       responses:
         '200':
           description: Link
@@ -152,12 +473,12 @@ paths:
                 type: object
       security:
         -
-          bearerAuth: []
-    patch:
+          ApiKeyAuth: []
+    delete:
       tags:
         - Links
-      summary: 'Edit a link'
-      operationId: editLink
+      summary: 'Delete a link'
+      operationId: linkDelete
       parameters:
         -
           name: link_id
@@ -167,20 +488,24 @@ paths:
           schema:
             type: string
             format: uuid
-            example: ffefc6c4-d970-4373-a867-2a69c8be2c89
-      requestBody:
-        description: 'Info of the link to edit'
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EditLinkRequest'
       responses:
-        '200':
+        '204':
           description: Link
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Link'
+        '404':
+          description: 'Not Found'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 404 }
+                  detail: { type: string }
+                type: object
         '401':
           description: Unauthorized
           content:
@@ -216,16 +541,90 @@ paths:
                 type: object
       security:
         -
-          bearerAuth: []
+          ApiKeyAuth: []
+    patch:
+      tags:
+        - Links
+      summary: 'Edit a link'
+      operationId: linkEdit
+      parameters:
+        -
+          name: link_id
+          in: path
+          description: 'Link API ID'
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: 'Info of the link to edit'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LinkEditRequest'
+      responses:
+        '200':
+          description: Link
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Link'
+        '404':
+          description: 'Not Found'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 404 }
+                  detail: { type: string }
+                type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 401 }
+                  detail: { type: string }
+                type: object
+        '422':
+          description: 'Validation Failed'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 422 }
+                  detail: { type: string }
+                type: object
+        '500':
+          description: 'Internal Error'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 500 }
+                  detail: { type: string }
+                type: object
+      security:
+        -
+          ApiKeyAuth: []
   /links:
     get:
       tags:
         - Links
       summary: 'List links'
-      operationId: listLinks
+      operationId: linkList
       parameters:
         -
-          name: team_id
+          name: workspace_id
           in: query
           description: 'Filter by Workspace API ID'
           schema:
@@ -253,7 +652,7 @@ paths:
             type: integer
             default: 10
             maximum: 50
-            minimum: 10
+            minimum: 1
         -
           name: page
           in: query
@@ -310,19 +709,18 @@ paths:
                 type: object
       security:
         -
-          bearerAuth: []
-  /links/create:
+          ApiKeyAuth: []
     post:
       tags:
         - Links
       summary: 'Create a link'
-      operationId: createLink
+      operationId: linkCreate
       requestBody:
         description: 'Info of the link to create'
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateLinkRequest'
+              $ref: '#/components/schemas/LinkCreateRequest'
       responses:
         '201':
           description: Link
@@ -376,13 +774,13 @@ paths:
                 type: object
       security:
         -
-          bearerAuth: []
-  /qrcodes/create:
+          ApiKeyAuth: []
+  /qrcodes:
     post:
       tags:
         - 'QR Codes'
       summary: 'Create a QR Code'
-      operationId: createQrCode
+      operationId: qrcodeCreate
       requestBody:
         description: 'Info of the QR Code to create'
         content:
@@ -415,8 +813,8 @@ paths:
               type: object
               oneOf:
                 -
-                  required: [url, team_id]
-                  properties: { url: { description: 'URL of the QR Code', type: string, format: url }, team_id: { description: 'Workspace API ID', type: string, format: uuid } }
+                  required: [url, workspace_id]
+                  properties: { url: { description: 'URL of the QR Code', type: string, format: url }, workspace_id: { description: 'Workspace API ID', type: string, format: uuid } }
                   type: object
                 -
                   required: [link_id]
@@ -447,6 +845,17 @@ paths:
                   type: { type: string }
                   title: { type: string }
                   status: { type: integer, example: 401 }
+                  detail: { type: string }
+                type: object
+        '404':
+          description: 'Not Found'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 404 }
                   detail: { type: string }
                 type: object
         '422':
@@ -484,44 +893,50 @@ paths:
                 type: object
       security:
         -
-          bearerAuth: []
+          ApiKeyAuth: []
   /statistics:
-    post:
+    get:
       tags:
         - Statistics
-      summary: 'Get statistics of a link'
-      operationId: getStatistics
-      requestBody:
-        description: 'Infos to provide to get statistics of a link'
-        content:
-          application/json:
-            schema:
-              required:
-                - link_id
-              properties:
-                link_id:
-                  description: 'Link API ID'
-                  type: string
-                  format: uuid
-                from:
-                  description: 'Get statistics from this date'
-                  type: string
-                  format: date-time
-                to:
-                  description: 'Get statistics until this date'
-                  type: string
-                  format: date-time
-              type: object
+      summary: 'Get statistics'
+      operationId: statisticGet
+      parameters:
+        -
+          name: link_id
+          in: query
+          description: 'Link API ID'
+          required: true
+          schema:
+            type: string
+            format: uuid
+        -
+          name: from
+          in: query
+          description: 'Get statistics from this date'
+          required: false
+          schema:
+            type: string
+            format: date-time
+        -
+          name: to
+          in: query
+          description: 'Get statistics until this date'
+          required: false
+          schema:
+            type: string
+            format: date-time
       responses:
         '200':
-          description: 'Statistics of the link'
+          description: Statistics
           content:
             application/json:
               schema:
                 properties:
                   link_id: { description: 'Link API ID', type: string, format: uuid }
-                  clicks: { description: 'Total number of visits, combining clicks and scans', type: integer, example: 51 }
-                  unique_clicks: { description: 'Number of unique visitors, combining clicks and scans', type: integer, example: 32 }
+                  visits: { description: 'Total number of visits, combining clicks and scans', type: integer, example: 51 }
+                  unique_visits: { description: 'Number of unique visitors, combining clicks and scans', type: integer, example: 32 }
+                  clicks: { description: 'Number of clicks', type: integer, example: 42 }
+                  scans: { description: 'Number of scans', type: integer, example: 9 }
                 type: object
         '404':
           description: 'Not Found'
@@ -558,13 +973,71 @@ paths:
                 type: object
       security:
         -
-          bearerAuth: []
-  /teams:
+          ApiKeyAuth: []
+  '/workspaces/{workspace_id}':
     get:
       tags:
         - Workspaces
-      summary: 'Get workspaces of user'
-      operationId: getTeams
+      summary: 'Get a workspace'
+      operationId: workspaceGet
+      parameters:
+        -
+          name: workspace_id
+          in: path
+          description: 'Workspace API ID'
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Workspace
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workspace'
+        '404':
+          description: 'Not Found'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 404 }
+                  detail: { type: string }
+                type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 401 }
+                  detail: { type: string }
+                type: object
+        '422':
+          description: 'Validation Failed'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 422 }
+                  detail: { type: string }
+                type: object
+      security:
+        -
+          ApiKeyAuth: []
+  /workspaces:
+    get:
+      tags:
+        - Workspaces
+      summary: 'List workspaces of user'
+      operationId: workspaceList
       responses:
         '200':
           description: 'Workspaces of user'
@@ -572,7 +1045,7 @@ paths:
             application/json:
               schema:
                 properties:
-                  teams: { type: array, items: { properties: { id: { description: 'Workspace API ID', type: string, format: uuid, example: ffefc6c4-d970-4373-a867-2a69c8be2c89 }, name: { description: 'Workspace name', type: string, example: 'the best team' } }, type: object } }
+                  workspaces: { type: array, items: { $ref: '#/components/schemas/Workspace' } }
                 type: object
         '401':
           description: Unauthorized
@@ -587,230 +1060,88 @@ paths:
                 type: object
       security:
         -
-          bearerAuth: []
-  '/folders/{team_id}':
-    get:
-      tags:
-        - Folders
-      summary: 'Get folders of workspace'
-      operationId: getFolders
-      parameters:
-        -
-          name: team_id
-          in: path
-          description: 'Workspace API ID'
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: ffefc6c4-d970-4373-a867-2a69c8be2c89
-      responses:
-        '200':
-          description: 'Folders of workspace'
-          content:
-            application/json:
-              schema:
-                properties:
-                  folders: { type: array, items: { properties: { id: { description: 'Folder API ID', type: string, format: uuid, example: 436b5d20-e174-4363-94e5-2b3dd4e74b5f }, name: { description: 'Folder name', type: string, example: folder-campaign-google-ads } }, type: object } }
-                type: object
-        '404':
-          description: 'Not Found'
-          content:
-            application/problem+json:
-              schema:
-                properties:
-                  type: { type: string }
-                  title: { type: string }
-                  status: { type: integer, example: 404 }
-                  detail: { type: string }
-                type: object
-        '401':
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                properties:
-                  type: { type: string }
-                  title: { type: string }
-                  status: { type: integer, example: 401 }
-                  detail: { type: string }
-                type: object
-        '422':
-          description: 'Validation Failed'
-          content:
-            application/problem+json:
-              schema:
-                properties:
-                  type: { type: string }
-                  title: { type: string }
-                  status: { type: integer, example: 422 }
-                  detail: { type: string }
-                type: object
-      security:
-        -
-          bearerAuth: []
-  /folders/create:
-    post:
-      tags:
-        - Folders
-      summary: 'Create a folder'
-      operationId: createFolder
-      requestBody:
-        description: 'You can use this endpoint to add a folder to URLR.'
-        content:
-          application/json:
-            schema:
-              required:
-                - team_id
-                - name
-              properties:
-                team_id:
-                  description: 'Team API ID'
-                  type: string
-                  format: uuid
-                name:
-                  description: Name
-                  type: string
-                parent_id:
-                  description: 'Folder API ID (if any)'
-                  type: string
-                  format: uuid
-                color:
-                  description: 'Color of folder'
-                  type: string
-                  enum: [blue, green, orange, purple, red, rose, yellow, black]
-              type: object
-      responses:
-        '200':
-          description: Folder
-          content:
-            application/json:
-              schema:
-                properties:
-                  team_id: { description: 'Team API ID', type: string, format: uuid }
-                  name: { description: Name, type: string }
-                  parent_id: { description: 'Parent Folder API ID (if any)', type: string, format: uuid }
-                  parent_name: { description: 'Parent Folder name (if any)', type: string }
-                  color: { description: 'Color of folder', type: string, enum: [48aefa, 2bcbba, fa8231, cd84f1, e74c3c, ff9ff3, ffdd59, 2b2b2b] }
-                type: object
-        '401':
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                properties:
-                  type: { type: string }
-                  title: { type: string }
-                  status: { type: integer, example: 401 }
-                  detail: { type: string }
-                type: object
-        '429':
-          description: 'Limits Exceeded'
-          content:
-            application/problem+json:
-              schema:
-                properties:
-                  type: { type: string }
-                  title: { type: string }
-                  status: { type: integer, example: 429 }
-                  detail: { type: string }
-                type: object
-        '409':
-          description: Conflict
-          content:
-            application/problem+json:
-              schema:
-                properties:
-                  type: { type: string }
-                  title: { type: string }
-                  status: { type: integer, example: 409 }
-                  detail: { type: string }
-                type: object
-  /domains/create:
-    post:
-      tags:
-        - Domains
-      summary: 'Create a domain'
-      operationId: createDomain
-      requestBody:
-        description: 'You can use this endpoint to add a custom domain to URLR.'
-        content:
-          application/json:
-            schema:
-              required:
-                - team_id
-                - domain
-              properties:
-                team_id:
-                  description: 'Team API ID'
-                  type: string
-                  format: uuid
-                domain:
-                  description: Domain
-                  type: string
-                  format: hostname
-                  example: mybrand.com
-                root_url:
-                  description: 'Redirect URL for the root of the domain'
-                  type: string
-                  format: url
-              type: object
-      responses:
-        '200':
-          description: Domain
-          content:
-            application/json:
-              schema:
-                properties:
-                  domain: { description: Domain, type: string, format: hostname, example: mybrand.com }
-                  root_url: { description: 'Redirect URL for the root of the domain', type: string, format: url }
-                type: object
-        '401':
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                properties:
-                  type: { type: string }
-                  title: { type: string }
-                  status: { type: integer, example: 401 }
-                  detail: { type: string }
-                type: object
-        '429':
-          description: 'Limits Exceeded'
-          content:
-            application/problem+json:
-              schema:
-                properties:
-                  type: { type: string }
-                  title: { type: string }
-                  status: { type: integer, example: 429 }
-                  detail: { type: string }
-                type: object
-        '409':
-          description: Conflict
-          content:
-            application/problem+json:
-              schema:
-                properties:
-                  type: { type: string }
-                  title: { type: string }
-                  status: { type: integer, example: 409 }
-                  detail: { type: string }
-                type: object
+          ApiKeyAuth: []
 components:
   schemas:
+    Domain:
+      properties:
+        id:
+          description: 'Domain API ID'
+          type: string
+          format: uuid
+        domain:
+          description: Domain
+          type: string
+          format: hostname
+          example: mybrand.com
+        root_url:
+          description: 'Redirect URL for the root of the domain'
+          type: string
+          format: url
+        created_at:
+          description: 'Creation date'
+          type: string
+          format: date-time
+        updated_at:
+          description: 'Modification date'
+          type: string
+          format: date-time
+      type: object
+    Folder:
+      properties:
+        id:
+          description: 'Folder API ID'
+          type: string
+          format: uuid
+        name:
+          description: Name
+          type: string
+        workspace_id:
+          description: 'Workspace API ID'
+          type: string
+          format: uuid
+        parent_id:
+          description: 'Parent Folder API ID'
+          type: string
+          format: uuid
+        parent_name:
+          description: 'Parent Folder name'
+          type: string
+        color:
+          description: 'Color of folder'
+          type: string
+          enum:
+            - blue
+            - green
+            - orange
+            - purple
+            - red
+            - rose
+            - yellow
+            - black
+        domain:
+          description: Domain
+          type: string
+          format: hostname
+        created_at:
+          description: 'Creation date'
+          type: string
+          format: date-time
+        updated_at:
+          description: 'Modification date'
+          type: string
+          format: date-time
+      type: object
     Link:
       properties:
         id:
           description: 'Link API ID'
           type: string
           format: uuid
-          example: 436b5d20-e174-4363-94e5-2b3dd4e74b5f
         url:
           description: 'Original URL'
           type: string
-        team_id:
+        workspace_id:
           description: 'Workspace API ID'
           type: string
           format: uuid
@@ -818,6 +1149,9 @@ components:
           description: 'Folder API ID'
           type: string
           format: uuid
+        user:
+          description: User
+          type: string
         domain:
           description: Domain
           type: string
@@ -827,9 +1161,47 @@ components:
           description: 'Short code'
           type: string
           example: xxxxx
+          maxLength: 50
+          minLength: 2
         label:
           description: Label
           type: string
+          maxLength: 255
+        password:
+          description: 'Password: "**********" means a password exists; null means no password.'
+          type: string
+          example: '**********'
+          maxLength: 255
+        created_at:
+          description: 'Creation date'
+          type: string
+          format: date-time
+        updated_at:
+          description: 'Modification date'
+          type: string
+          format: date-time
+        delete_at:
+          description: 'Scheduled deletion date'
+          type: string
+          format: date-time
+        expired_at:
+          description: 'Scheduled expiration date'
+          type: string
+          format: date-time
+        expired_url:
+          description: 'The URL to which users will be redirected after the link has expired'
+          type: string
+          format: url
+        expired_title:
+          description: 'The title displayed on the expiration page'
+          type: string
+        expired_text:
+          description: 'The text displayed on the expiration page'
+          type: string
+        delete_after_expiration:
+          description: 'Whether the link should be deleted once it has expired'
+          type: boolean
+          default: false
         tags:
           description: Tags
           type: array
@@ -844,10 +1216,6 @@ components:
                 type: string
             type: object
           maxItems: 3
-        password:
-          description: 'Password: "**********" means a password exists; null means no password.'
-          type: string
-          example: '**********'
         qrcode:
           description: 'QR Code associated to the short link'
           properties:
@@ -907,32 +1275,8 @@ components:
                 type: string
                 format: url
             type: object
-        created_at:
-          description: 'Creation date'
-          type: string
-          format: date-time
-        updated_at:
-          description: 'Modification date'
-          type: string
-          format: date-time
-        delete_at:
-          description: 'Scheduled deletion date'
-          type: string
-          format: date-time
-        expired_at:
-          description: 'Scheduled expiration date'
-          type: string
-          format: date-time
-        expired_url:
-          description: 'Expiration URL'
-          type: string
-          format: url
-        delete_after_expiration:
-          description: 'Whether or not to remove the link after the expiry date'
-          type: boolean
-          default: false
       type: object
-    BaseLinkRequest:
+    LinkBaseRequest:
       properties:
         url:
           description: 'URL to shorten'
@@ -950,11 +1294,40 @@ components:
         code:
           description: 'Custom short code'
           type: string
-          pattern: '^[a-zA-Z0-9!-]{2,50}$'
+          pattern: '^[\p{L}0-9_\-/]{2,50}$'
           example: xxxxx
+          maxLength: 50
+          minLength: 2
         label:
           description: Label
           type: string
+          maxLength: 255
+        password:
+          description: Password
+          type: string
+          maxLength: 255
+        delete_at:
+          description: 'Scheduled deletion date'
+          type: string
+          format: date-time
+        expired_at:
+          description: 'Scheduled expiration date'
+          type: string
+          format: date-time
+        expired_url:
+          description: 'The URL to which users will be redirected after the link has expired'
+          type: string
+          format: url
+        expired_title:
+          description: 'The title displayed on the expiration page'
+          type: string
+        expired_text:
+          description: 'The text displayed on the expiration page'
+          type: string
+        delete_after_expiration:
+          description: 'Whether the link should be deleted once it has expired'
+          type: boolean
+          default: false
         tags:
           description: Tags
           type: array
@@ -962,9 +1335,6 @@ components:
             type: string
             format: uuid
           maxItems: 3
-        password:
-          description: Password
-          type: string
         qrcode:
           description: 'QR Code'
           properties:
@@ -1047,65 +1417,59 @@ components:
                 type: string
                 format: url
             type: object
-        delete_at:
-          description: 'Scheduled deletion date'
-          type: string
-          format: date-time
-        expired_at:
-          description: 'Scheduled expiration date'
-          type: string
-          format: date-time
-        expired_url:
-          description: 'Expiration URL'
-          type: string
-          format: url
-        delete_after_expiration:
-          description: 'Whether or not to remove the link after the expiry date'
-          type: boolean
-          default: false
       type: object
-    CreateLinkRequest:
+    LinkCreateRequest:
       allOf:
         -
           required:
             - url
-            - team_id
+            - workspace_id
           properties:
-            team_id:
+            workspace_id:
               description: 'Workspace API ID'
               type: string
               format: uuid
           type: object
         -
-          $ref: '#/components/schemas/BaseLinkRequest'
-    EditLinkRequest:
+          $ref: '#/components/schemas/LinkBaseRequest'
+    LinkEditRequest:
       allOf:
         -
-          $ref: '#/components/schemas/BaseLinkRequest'
+          $ref: '#/components/schemas/LinkBaseRequest'
+    Workspace:
+      properties:
+        id:
+          description: 'Workspace API ID'
+          type: string
+          format: uuid
+        name:
+          description: 'Workspace name'
+          type: string
+          example: 'the best team'
+        created_at:
+          description: 'Creation date'
+          type: string
+          format: date-time
+        updated_at:
+          description: 'Modification date'
+          type: string
+          format: date-time
+      type: object
   securitySchemes:
-    bearerAuth:
-      type: http
-      bearerFormat: JWT
-      scheme: bearer
+    ApiKeyAuth:
+      type: apiKey
+      name: X-API-KEY
+      in: header
 tags:
   -
-    name: 'Access Tokens'
-    description: 'Access Tokens'
-  -
     name: Links
-    description: Links
   -
     name: 'QR Codes'
-    description: 'QR Codes'
   -
     name: Statistics
-    description: Statistics
   -
     name: Workspaces
-    description: Workspaces
   -
     name: Folders
-    description: Folders
   -
     name: Domains
-    description: Domains
