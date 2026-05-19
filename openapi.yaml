@@ -266,15 +266,6 @@ paths:
         - Folders
       summary: 'List folders'
       operationId: folderList
-      parameters:
-        -
-          name: workspace_id
-          in: query
-          description: 'Workspace API ID'
-          required: true
-          schema:
-            type: string
-            format: uuid
       responses:
         '200':
           description: 'Folders of workspace'
@@ -331,13 +322,8 @@ paths:
           application/json:
             schema:
               required:
-                - workspace_id
                 - name
               properties:
-                workspace_id:
-                  description: 'Workspace API ID'
-                  type: string
-                  format: uuid
                 name:
                   description: Name
                   type: string
@@ -490,11 +476,7 @@ paths:
             format: uuid
       responses:
         '204':
-          description: Link
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Link'
+          description: 'Link deleted'
         '404':
           description: 'Not Found'
           content:
@@ -623,13 +605,6 @@ paths:
       summary: 'List links'
       operationId: linkList
       parameters:
-        -
-          name: workspace_id
-          in: query
-          description: 'Filter by Workspace API ID'
-          schema:
-            type: string
-            format: uuid
         -
           name: folder_id
           in: query
@@ -813,8 +788,8 @@ paths:
               type: object
               oneOf:
                 -
-                  required: [url, workspace_id]
-                  properties: { url: { description: 'URL of the QR Code', type: string, format: url }, workspace_id: { description: 'Workspace API ID', type: string, format: uuid } }
+                  required: [url]
+                  properties: { url: { description: 'URL of the QR Code', type: string, format: url } }
                   type: object
                 -
                   required: [link_id]
@@ -969,93 +944,6 @@ paths:
                   type: { type: string }
                   title: { type: string }
                   status: { type: integer, example: 422 }
-                  detail: { type: string }
-                type: object
-      security:
-        -
-          ApiKeyAuth: []
-  '/workspaces/{workspace_id}':
-    get:
-      tags:
-        - Workspaces
-      summary: 'Get a workspace'
-      operationId: workspaceGet
-      parameters:
-        -
-          name: workspace_id
-          in: path
-          description: 'Workspace API ID'
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Workspace
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Workspace'
-        '404':
-          description: 'Not Found'
-          content:
-            application/problem+json:
-              schema:
-                properties:
-                  type: { type: string }
-                  title: { type: string }
-                  status: { type: integer, example: 404 }
-                  detail: { type: string }
-                type: object
-        '401':
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                properties:
-                  type: { type: string }
-                  title: { type: string }
-                  status: { type: integer, example: 401 }
-                  detail: { type: string }
-                type: object
-        '422':
-          description: 'Validation Failed'
-          content:
-            application/problem+json:
-              schema:
-                properties:
-                  type: { type: string }
-                  title: { type: string }
-                  status: { type: integer, example: 422 }
-                  detail: { type: string }
-                type: object
-      security:
-        -
-          ApiKeyAuth: []
-  /workspaces:
-    get:
-      tags:
-        - Workspaces
-      summary: 'List workspaces of user'
-      operationId: workspaceList
-      responses:
-        '200':
-          description: 'Workspaces of user'
-          content:
-            application/json:
-              schema:
-                properties:
-                  workspaces: { type: array, items: { $ref: '#/components/schemas/Workspace' } }
-                type: object
-        '401':
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                properties:
-                  type: { type: string }
-                  title: { type: string }
-                  status: { type: integer, example: 401 }
                   detail: { type: string }
                 type: object
       security:
@@ -1423,38 +1311,12 @@ components:
         -
           required:
             - url
-            - workspace_id
-          properties:
-            workspace_id:
-              description: 'Workspace API ID'
-              type: string
-              format: uuid
-          type: object
         -
           $ref: '#/components/schemas/LinkBaseRequest'
     LinkEditRequest:
       allOf:
         -
           $ref: '#/components/schemas/LinkBaseRequest'
-    Workspace:
-      properties:
-        id:
-          description: 'Workspace API ID'
-          type: string
-          format: uuid
-        name:
-          description: 'Workspace name'
-          type: string
-          example: 'the best team'
-        created_at:
-          description: 'Creation date'
-          type: string
-          format: date-time
-        updated_at:
-          description: 'Modification date'
-          type: string
-          format: date-time
-      type: object
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
@@ -1467,8 +1329,6 @@ tags:
     name: 'QR Codes'
   -
     name: Statistics
-  -
-    name: Workspaces
   -
     name: Folders
   -
