@@ -1,7 +1,7 @@
 npmName: urlr-js
-npmVersion: 3.2.3
+npmVersion: 3.2.4
 gitHost: github.com
-gitUserId: urlr
-gitRepoId: urlr-javascript
+gitUserId: URLR
+gitRepoId: api-clients-generation
 templateDir: openapi-generator/templates/typescript-fetch
 licenseName: MIT
