@@ -9,7 +9,7 @@ info:
   license:
     name: 'All rights reserved'
     url: 'https://urlr.me/en/legal-notice'
-  version: 2.0.0
+  version: 2.1.0
 servers:
   -
     url: 'https://urlr.me/api/v2'
@@ -70,6 +70,17 @@ paths:
                   status: { type: integer, example: 422 }
                   detail: { type: string }
                 type: object
+        '500':
+          description: 'Internal Error'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 500 }
+                  detail: { type: string }
+                type: object
       security:
         -
           ApiKeyAuth: []
@@ -119,6 +130,17 @@ paths:
                   type: { type: string }
                   title: { type: string }
                   status: { type: integer, example: 422 }
+                  detail: { type: string }
+                type: object
+        '500':
+          description: 'Internal Error'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 500 }
                   detail: { type: string }
                 type: object
       security:
@@ -199,6 +221,17 @@ paths:
                   status: { type: integer, example: 422 }
                   detail: { type: string }
                 type: object
+        '500':
+          description: 'Internal Error'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 500 }
+                  detail: { type: string }
+                type: object
       security:
         -
           ApiKeyAuth: []
@@ -257,6 +290,17 @@ paths:
                   status: { type: integer, example: 422 }
                   detail: { type: string }
                 type: object
+        '500':
+          description: 'Internal Error'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 500 }
+                  detail: { type: string }
+                type: object
       security:
         -
           ApiKeyAuth: []
@@ -306,6 +350,17 @@ paths:
                   type: { type: string }
                   title: { type: string }
                   status: { type: integer, example: 422 }
+                  detail: { type: string }
+                type: object
+        '500':
+          description: 'Internal Error'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 500 }
                   detail: { type: string }
                 type: object
       security:
@@ -399,6 +454,17 @@ paths:
                   status: { type: integer, example: 422 }
                   detail: { type: string }
                 type: object
+        '500':
+          description: 'Internal Error'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 500 }
+                  detail: { type: string }
+                type: object
       security:
         -
           ApiKeyAuth: []
@@ -455,6 +521,17 @@ paths:
                   type: { type: string }
                   title: { type: string }
                   status: { type: integer, example: 422 }
+                  detail: { type: string }
+                type: object
+        '500':
+          description: 'Internal Error'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 500 }
                   detail: { type: string }
                 type: object
       security:
@@ -680,6 +757,17 @@ paths:
                   type: { type: string }
                   title: { type: string }
                   status: { type: integer, example: 401 }
+                  detail: { type: string }
+                type: object
+        '500':
+          description: 'Internal Error'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 500 }
                   detail: { type: string }
                 type: object
       security:
@@ -946,6 +1034,17 @@ paths:
                   status: { type: integer, example: 422 }
                   detail: { type: string }
                 type: object
+        '500':
+          description: 'Internal Error'
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  type: { type: string }
+                  title: { type: string }
+                  status: { type: integer, example: 500 }
+                  detail: { type: string }
+                type: object
       security:
         -
           ApiKeyAuth: []
@@ -1044,7 +1143,7 @@ components:
           description: Domain
           type: string
           format: hostname
-          example: urlr.me
+          example: mybrand.com
         code:
           description: 'Short code'
           type: string
@@ -1130,6 +1229,14 @@ components:
               description: utm_content
               type: string
               maxLength: 255
+            campaign_id:
+              description: utm_id
+              type: string
+              maxLength: 255
+            term:
+              description: utm_term
+              type: string
+              maxLength: 255
           type: object
         metatag:
           description: 'Custom metadata for social previews'
@@ -1180,7 +1287,7 @@ components:
           format: hostname
           example: mybrand.com
         code:
-          description: 'Custom short code'
+          description: 'Length must be between 2 and 50 characters if a custom domain is set, or between 2 and 49 characters otherwise.'
           type: string
           pattern: '^[\p{L}0-9_\-/]{2,50}$'
           example: xxxxx
@@ -1270,6 +1377,14 @@ components:
               maxLength: 255
             content:
               description: utm_content
+              type: string
+              maxLength: 255
+            campaign_id:
+              description: utm_id
+              type: string
+              maxLength: 255
+            term:
+              description: utm_term
               type: string
               maxLength: 255
           type: object
