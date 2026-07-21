@@ -1,6 +1,6 @@
 packageName: URLR
 composerPackageName: urlr/urlr-php
-artifactVersion: 3.2.0
+artifactVersion: 3.2.1
 invokerPackage: URLR
 variableNamingConvention: camelCase
 developerOrganization: URLR
