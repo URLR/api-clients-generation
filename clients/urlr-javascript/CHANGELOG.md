@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.2.3] - 2026-07-21
+
+- First release done with the new Trusted Publishing workflow
+
 ## [3.2.2] - 2026-07-21
 
 - First release done with the new Trusted Publishing workflow
