@@ -15,10 +15,20 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '26'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Update npm
+        run: npm install -g npm@latest
+
       - name: Build and Deploy 🚀
         env:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         run: |
+          npm --version
           npm install
           npm run generate-javascript
           git clone https://$API_TOKEN_GITHUB@github.com/URLR/urlr-javascript clones/urlr-javascript &> /dev/null
@@ -33,7 +43,6 @@ jobs:
             PACKAGE_VERSION=$(awk '/- Package version:/{print $NF}' README.md)
             git tag -a $PACKAGE_VERSION -m $PACKAGE_VERSION
             git push --tags origin main
-            npm config set //registry.npmjs.org/:_authToken $NODE_AUTH_TOKEN
             npm publish
           else
             echo "  No changes, skipping."
